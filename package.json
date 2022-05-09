@@ -34,6 +34,7 @@
 		"ajv": "^8.10.0",
 		"eslint": "^8.5.0",
 		"http-server": "^0.12.3",
+		"json-source-map": "^0.6.1",
 		"probe-image-size": "^6.0.0",
 		"readline-sync": "^1.4.10",
 		"sass": "^1.45.0",
@@ -41,7 +42,7 @@
 		"stylelint": "^13.13.1",
 		"stylelint-config-sass-guidelines": "^8.0.0",
 		"terser": "^5.10.0",
-		"json-source-map": "^0.6.1"
+		"workbox-cli": "^6.5.3"
 	},
 	"bugs": {
 		"url": "https://github.com/5etools-mirror-1/5etools-mirror-1.github.io/issues"
