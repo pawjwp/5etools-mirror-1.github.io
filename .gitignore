@@ -17,3 +17,6 @@ js/sw-files.js
 # Misc dev/scripting files
 trash
 trash_in
+
+# the compiled sw
+sw.js
