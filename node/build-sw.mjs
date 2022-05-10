@@ -31,6 +31,7 @@ buildResultLog("workbox manifest injection", {...workboxBuildResult, size: bytes
 const esbuildBuildResult = await esbuild.build({
 	entryPoints: ["sw.js"],
 	bundle: true,
+	minify: true,
 	allowOverwrite: true,
 	outfile: "sw.js",
 });
