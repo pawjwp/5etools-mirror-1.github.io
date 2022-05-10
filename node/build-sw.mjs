@@ -1,29 +1,38 @@
 import {injectManifest} from "workbox-build";
 import esbuild from "esbuild";
-import {writeFile} from "fs/promises";
 
-await writeFile("sw.js", "");
+/**
+ * convert from bytes to mb and label the units
+ * @param {number} bytes
+ * @returns String of the mb conversion with label
+ */
+const bytesToMb = (bytes) => `${(bytes / 1e6).toPrecision(3)} mb`;
 
-const resp = await injectManifest({
+const buildResultLog = (label, buildResult) => {
+	console.log(`\n${label}:`);
+	console.log(buildResult);
+};
+
+const workboxBuildResult = await injectManifest({
 	swSrc: "sw-template.js",
 	swDest: "sw.js",
-	globDirectory: "/",
+	maximumFileSizeToCacheInBytes: 5 /* mb */ * 1e6,
+	globDirectory: "", // use the current directory - run this script from project root.
 	globPatterns: [
-		"/js/**/*.js",
-		"/css/**/*.css",
+		"js/**/*.js",
+		"css/**/*.css",
+		"data/**/*.json",
 		"*.html",
 	],
 });
 
-console.log(resp);
+buildResultLog("workbox manifest injection", {...workboxBuildResult, size: bytesToMb(workboxBuildResult.size)});
 
-console.log("manifest injected");
-
-await esbuild.build({
+const esbuildBuildResult = await esbuild.build({
 	entryPoints: ["sw.js"],
 	bundle: true,
 	allowOverwrite: true,
 	outfile: "sw.js",
 });
 
-console.log("esbuild bundled");
+buildResultLog("esbuild bundling", esbuildBuildResult);
