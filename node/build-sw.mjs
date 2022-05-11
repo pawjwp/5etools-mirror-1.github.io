@@ -27,6 +27,7 @@ const workboxBuildResult = await injectManifest({
 		"data/*.json", // root level data
 		"data/**/!(adventure)/*.json", // matches all json in data unless it is a file inside a directory called adventure
 		"*.html", // all html pages need to be loaded
+		"search/*.json", // search data is needed
 		"manifest.webmanifest", // we should make sure we have the manifest, although its not strictly needed...
 		// we want to store fonts to make things styled nicely
 		"fonts/glyphicons-halflings-regular.woff2",
