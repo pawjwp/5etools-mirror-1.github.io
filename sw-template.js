@@ -6,7 +6,7 @@ import { generateURLVariations } from "workbox-precaching/utils/generateURLVaria
 import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
 
 // the self value is replaced with key: value pair of file: hash, to allow workbox to carry files over between caches if they match
-// precacheAndRoute(self.__WB_MANIFEST);
+// precacheAndRoute(self.__WB_PRECACHE_MANIFEST);
 
 // this tells workbox to cache any of the selected types, and serve them cache first after first load
 // this works on the assumption that fonts are static assets and won't change

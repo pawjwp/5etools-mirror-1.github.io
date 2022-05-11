@@ -16,6 +16,7 @@ const buildResultLog = (label, buildResult) => {
 const workboxBuildResult = await injectManifest({
 	swSrc: "sw-template.js",
 	swDest: "sw.js",
+	injectionPoint: "self.__WB_PRECACHE_MANIFEST",
 	maximumFileSizeToCacheInBytes: 5 /* mb */ * 1e6,
 	globDirectory: "", // use the current directory - run this script from project root.
 	globPatterns: [
@@ -35,7 +36,7 @@ const workboxBuildResult = await injectManifest({
 	],
 });
 
-buildResultLog("workbox manifest injection", {...workboxBuildResult, size: bytesToMb(workboxBuildResult.size)});
+buildResultLog(`workbox manifest "self.__WB_PRECACHE_MANIFEST" injection`, {...workboxBuildResult, size: bytesToMb(workboxBuildResult.size)});
 
 const esbuildBuildResult = await esbuild.build({
 	entryPoints: ["sw.js"],
