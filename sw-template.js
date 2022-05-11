@@ -6,6 +6,6 @@ import { CacheFirst } from "workbox-strategies";
 precacheAndRoute(self.__WB_MANIFEST);
 
 // this tells workbox to cache any of the selected types, and serve them cache first after first load
-// this works on the assumption that images and fonts are static assets and won't change
-const cacheTypes = new Set(["image", "font"]);
+// this works on the assumption that fonts are static assets and won't change
+const cacheTypes = new Set(["font"]);
 registerRoute(({request}) => cacheTypes.has(request.destination), new CacheFirst());
