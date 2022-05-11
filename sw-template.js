@@ -6,7 +6,7 @@ import { generateURLVariations } from "workbox-precaching/utils/generateURLVaria
 import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
 
 // the self value is replaced with key: value pair of file: hash, to allow workbox to carry files over between caches if they match
-precacheAndRoute(self.__WB_MANIFEST);
+// precacheAndRoute(self.__WB_MANIFEST);
 
 // this tells workbox to cache any of the selected types, and serve them cache first after first load
 // this works on the assumption that fonts are static assets and won't change
@@ -24,20 +24,16 @@ class RevisionCacheFirst extends Strategy {
    * @returns {Promise<Response | undefined>}
    */
 	async _handle (request, handler) {
+		const cacheKey = createCacheKey({url: request.url, revision: 10});
+		console.log(cacheKey);
 		const cache = await caches.open(this.cacheName);
 
-		for (const key of generateURLVariations(request.url)) {
-			console.log(key);
-			// handler.cacheMatch(key).then(response => {
-			//   if(response !==)
-			// })
-		}
-
-		const cacheResponse = await handler.cacheMatch(request);
+		const cacheResponse = await cache.match(cacheKey);
+		console.log(cacheResponse);
 		if (cacheResponse !== undefined) return cacheResponse;
 
 		const fetchResponse = await handler.fetch(request);
-		handler.cachePut(request.url, fetchResponse.clone());
+		await cache.put(cacheKey.cacheKey, fetchResponse.clone());
 		return fetchResponse;
 	}
 }
