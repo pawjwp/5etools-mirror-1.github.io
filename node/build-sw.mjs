@@ -13,7 +13,7 @@ const buildResultLog = (label, buildResult) => {
 	console.log(buildResult);
 };
 
-const workboxBuildResult = await injectManifest({
+const workboxPrecacheBuildResult = await injectManifest({
 	swSrc: "sw-template.js",
 	swDest: "sw.js",
 	injectionPoint: "self.__WB_PRECACHE_MANIFEST",
@@ -36,7 +36,25 @@ const workboxBuildResult = await injectManifest({
 	],
 });
 
-buildResultLog(`workbox manifest "self.__WB_PRECACHE_MANIFEST" injection`, {...workboxBuildResult, size: bytesToMb(workboxBuildResult.size)});
+buildResultLog(`workbox manifest "self.__WB_PRECACHE_MANIFEST" injection`, {...workboxPrecacheBuildResult, size: bytesToMb(workboxPrecacheBuildResult.size)});
+
+const workboxRuntimeBuildResult = await injectManifest({
+	swSrc: "sw.js",
+	swDest: "sw.js",
+	injectionPoint: "self.__WB_RUNTIME_MANIFEST",
+	maximumFileSizeToCacheInBytes: 5 /* mb */ * 1e6,
+	globDirectory: "", // use the current directory - run this script from project root.
+	globPatterns: [
+		"data/adventure/**/*.json", // matches all adventure json
+	],
+	manifestTransforms: [
+		(manifest) =>
+			({manifest: manifest.map(entry => [entry.url, entry.revision])}),
+
+	],
+});
+
+buildResultLog(`workbox manifest "self.__WB_RUNTIME_MANIFEST" injection`, {...workboxRuntimeBuildResult, size: bytesToMb(workboxRuntimeBuildResult.size)});
 
 const esbuildBuildResult = await esbuild.build({
 	entryPoints: ["sw.js"],

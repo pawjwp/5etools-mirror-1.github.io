@@ -37,4 +37,12 @@ class RevisionCacheFirst extends Strategy {
 	}
 }
 
-registerRoute("/img/patreon.png", new RevisionCacheFirst());
+/**
+ * __WB_RUNTIME_MANIFEST is injected as [url, revision] map to be constructed as Map
+ */
+const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST);
+
+registerRoute(({request}) => {
+	console.log({request, has: runtimeManifest.has(request.url)});
+	return runtimeManifest.has(request.url);
+}, new RevisionCacheFirst(runtimeManifest));
