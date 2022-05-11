@@ -24,16 +24,15 @@ class RevisionCacheFirst extends Strategy {
    * @returns {Promise<Response | undefined>}
    */
 	async _handle (request, handler) {
-		const cacheKey = createCacheKey({url: request.url, revision: 10});
+		const cacheKey = createCacheKey({url: request.url, revision: 10}).cacheKey;
 		console.log(cacheKey);
-		const cache = await caches.open(this.cacheName);
 
-		const cacheResponse = await cache.match(cacheKey);
+		const cacheResponse = await handler.cacheMatch(cacheKey);
 		console.log(cacheResponse);
 		if (cacheResponse !== undefined) return cacheResponse;
 
 		const fetchResponse = await handler.fetch(request);
-		await cache.put(cacheKey.cacheKey, fetchResponse.clone());
+		await handler.cachePut(cacheKey, fetchResponse.clone());
 		return fetchResponse;
 	}
 }
