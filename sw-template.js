@@ -41,8 +41,11 @@ class RevisionCacheFirst extends Strategy {
  * __WB_RUNTIME_MANIFEST is injected as [url, revision] map to be constructed as Map
  */
 const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST);
+// this is... not awesome, but it should be highly performant after the up front cost
+const runtimeRevisionUrls = new Set(Array.from(runtimeManifest.keys())
+	.map((route) => `${self.location.origin}/${route}`));
 
-registerRoute(({request}) => {
-	console.log({request, has: runtimeManifest.has(request.url)});
-	return runtimeManifest.has(request.url);
-}, new RevisionCacheFirst(runtimeManifest));
+registerRoute(
+	({request}) => runtimeRevisionUrls.has(request.url),
+	new RevisionCacheFirst(runtimeManifest),
+);
