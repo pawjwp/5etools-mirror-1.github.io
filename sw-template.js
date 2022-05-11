@@ -2,6 +2,9 @@ import { precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { CacheFirst, Strategy, StrategyHandler } from "workbox-strategies";
 
+import { generateURLVariations } from "workbox-precaching/utils/generateURLVariations";
+import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
+
 // the self value is replaced with key: value pair of file: hash, to allow workbox to carry files over between caches if they match
 precacheAndRoute(self.__WB_MANIFEST);
 
@@ -11,12 +14,25 @@ const cacheTypes = new Set(["font"]);
 registerRoute(({request}) => cacheTypes.has(request.destination), new CacheFirst());
 
 class RevisionCacheFirst extends Strategy {
+	constructor () {
+		super({ cacheName: "runtime-revision" });
+	}
+
 	/**
    * @param {Request} request
    * @param {StrategyHandler} handler
    * @returns {Promise<Response | undefined>}
    */
 	async _handle (request, handler) {
+		const cache = await caches.open(this.cacheName);
+
+		for (const key of generateURLVariations(request.url)) {
+			console.log(key);
+			// handler.cacheMatch(key).then(response => {
+			//   if(response !==)
+			// })
+		}
+
 		const cacheResponse = await handler.cacheMatch(request);
 		if (cacheResponse !== undefined) return cacheResponse;
 
@@ -26,4 +42,4 @@ class RevisionCacheFirst extends Strategy {
 	}
 }
 
-registerRoute("/img/patreon.png", new RevisionCacheFirst({ cacheName: "runtime-revision" }));
+registerRoute("/img/patreon.png", new RevisionCacheFirst());
