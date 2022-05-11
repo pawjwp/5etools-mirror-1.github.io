@@ -18,7 +18,14 @@ class RevisionCacheFirst extends Strategy {
    * @param {StrategyHandler} handler
    * @returns {Promise<Response | undefined>}
    */
-	_handle (request, handler) {
+	async _handle (request, handler) {
+		const cacheResponse = await handler.cacheMatch(request);
+		if (cacheResponse !== undefined) return cacheResponse;
 
+		const fetchResponse = await handler.fetch(request);
+		handler.cachePut(request.url, fetchResponse.clone());
+		return fetchResponse;
 	}
 }
+
+registerRoute("/img/patreon.png", new RevisionCacheFirst({ cacheName: "runtime-revision" }));
