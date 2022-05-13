@@ -736,9 +736,12 @@ JqueryUtil = {
 
 	_ACTIVE_TOAST: [],
 	/**
-	 * @param {Object|string} options
+	 * @param {Object|string} options The options for the toast.
 	 * @param {(jQuery|string)} options.content Toast contents. Supports jQuery objects.
 	 * @param {string} options.type Toast type. Can be any Bootstrap alert type ("success", "info", "warning", or "danger").
+	 * @param {number} options.autoHideTime The time in ms before the toast will be automatically hidden.
+	 * Defaults to 5000 ms.
+	 * A value of 0 will cause the toast to never automatically hide.
 	 */
 	doToast (options) {
 		if (typeof window === "undefined") return;
@@ -750,6 +753,8 @@ JqueryUtil = {
 			};
 		}
 		options.type = options.type || "info";
+
+		options.autoHideTime = options.autoHideTime ?? 5000;
 
 		const doCleanup = ($toast) => {
 			$toast.removeClass("toast--animate");
@@ -775,7 +780,11 @@ JqueryUtil = {
 			});
 
 		setTimeout(() => $toast.addClass(`toast--animate`), 5);
-		setTimeout(() => doCleanup($toast), 5000);
+		if (options.autoHideTime !== 0) {
+			setTimeout(() => {
+				doCleanup($toast);
+			}, options.autoHideTime);
+		}
 
 		if (JqueryUtil._ACTIVE_TOAST.length) {
 			JqueryUtil._ACTIVE_TOAST.forEach($oldToast => {
