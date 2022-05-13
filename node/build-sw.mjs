@@ -1,6 +1,9 @@
 import {injectManifest} from "workbox-build";
 import esbuild from "esbuild";
 
+const args = process.argv.slice(2);
+const prod = args[0] === "prod";
+
 /**
  * convert from bytes to mb and label the units
  * @param {number} bytes
@@ -70,7 +73,8 @@ buildResultLog(
 const esbuildBuildResult = await esbuild.build({
 	entryPoints: ["sw.js"],
 	bundle: true,
-	minify: true,
+	minify: prod,
+	drop: prod ? ["console"] : undefined,
 	allowOverwrite: true,
 	outfile: "sw.js",
 });

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { CacheFirst, Strategy, StrategyHandler } from "workbox-strategies";
