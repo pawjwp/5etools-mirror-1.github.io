@@ -24,13 +24,20 @@ class RevisionCacheFirst extends Strategy {
    * @returns {Promise<Response | undefined>}
    */
 	async _handle (request, handler) {
-		console.log(request.url);
-		console.log(runtimeManifest);
-		const cacheKey = createCacheKey({url: request.url, revision: 10}).cacheKey;
+		/** the full url of the request, https://example.com/slug/ */
+		const url = request.url;
+		/**
+		 * the route of the url, with a query string for the revision
+		 *
+		 * this way, we can invalidate the cache entry if the revision is wrong
+		 */
+		const cacheKey = createCacheKey({url, revision: runtimeManifest.get(url)}).cacheKey;
 
 		const cacheResponse = await handler.cacheMatch(cacheKey);
+		// undefined is returned if we don't have a cache response for the key
 		if (cacheResponse !== undefined) return cacheResponse;
 
+		// we need to fetch the request from the network and store it with revision for next time
 		const fetchResponse = await handler.fetch(request);
 		await handler.cachePut(cacheKey, fetchResponse.clone());
 		return fetchResponse;
