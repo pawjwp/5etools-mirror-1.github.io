@@ -24,11 +24,11 @@ class RevisionCacheFirst extends Strategy {
    * @returns {Promise<Response | undefined>}
    */
 	async _handle (request, handler) {
+		console.log(request.url);
+		console.log(runtimeManifest);
 		const cacheKey = createCacheKey({url: request.url, revision: 10}).cacheKey;
-		console.log(cacheKey);
 
 		const cacheResponse = await handler.cacheMatch(cacheKey);
-		console.log(cacheResponse);
 		if (cacheResponse !== undefined) return cacheResponse;
 
 		const fetchResponse = await handler.fetch(request);
@@ -38,15 +38,23 @@ class RevisionCacheFirst extends Strategy {
 }
 
 /**
- * __WB_RUNTIME_MANIFEST is injected as [url, revision] map to be constructed as Map
+ * Map([url, revision])
+ *
+ * __WB_RUNTIME_MANIFEST is injected as [route, revision] array, mapped into [url, revision], and constructed as map
  */
-const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST);
-// this is... not awesome, but it should be highly performant after the up front cost
-const runtimeRevisionUrls = new Set(Array.from(runtimeManifest.keys())
-	.map((route) => `${self.location.origin}/${route}`));
+const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST.map(
+	([
+		route,
+		revision,
+	]) =>
+		[
+			`${self.location.origin}/${route}`,
+			revision,
+		],
+));
 
 registerRoute(
-	({request}) => runtimeRevisionUrls.has(request.url),
+	({request}) => runtimeManifest.has(request.url),
 	new RevisionCacheFirst(runtimeManifest),
 );
 
