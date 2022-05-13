@@ -16,6 +16,18 @@ const buildResultLog = (label, buildResult) => {
 	console.log(buildResult);
 };
 
+// we need to build the injector first so the glob matches and hashes the newest file
+const esbuildBuildResultSwInjector = await esbuild.build({
+	entryPoints: ["sw-injector-template.js"],
+	bundle: true,
+	minify: prod,
+	drop: prod ? ["console"] : undefined,
+	allowOverwrite: true,
+	outfile: "sw-injector.js",
+});
+
+buildResultLog("esbuild bundling sw-injector-template.js", esbuildBuildResultSwInjector);
+
 const workboxPrecacheBuildResult = await injectManifest({
 	swSrc: "sw-template.js",
 	swDest: "sw.js",
@@ -36,6 +48,8 @@ const workboxPrecacheBuildResult = await injectManifest({
 		// we want to store fonts to make things styled nicely
 		"fonts/glyphicons-halflings-regular.woff2",
 		"fonts/Convergence-Regular.ttf", // this should be a woff2 but that is its own pr
+		// we need to cache the sw-injector or we won't be injected
+		"sw-injector.js",
 	],
 });
 
@@ -91,14 +105,3 @@ const esbuildBuildResultSw = await esbuild.build({
 });
 
 buildResultLog("esbuild bundling sw-template.js", esbuildBuildResultSw);
-
-const esbuildBuildResultSwInjector = await esbuild.build({
-	entryPoints: ["sw-injector-template.js"],
-	bundle: true,
-	minify: prod,
-	drop: prod ? ["console"] : undefined,
-	allowOverwrite: true,
-	outfile: "sw-injector.js",
-});
-
-buildResultLog("esbuild bundling sw-injector-template.js", esbuildBuildResultSwInjector);
