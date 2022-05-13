@@ -5,6 +5,22 @@ import { CacheFirst, Strategy, StrategyHandler } from "workbox-strategies";
 import { generateURLVariations } from "workbox-precaching/utils/generateURLVariations";
 import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
 
+// nabbed from https://github.com/GoogleChrome/workbox/blob/0cc6975f17b60d67a71d8b717e73ef7ddb79a891/packages/workbox-core/src/_private/waitUntil.ts#L19-L26
+/**
+ * wait until an event happens
+ * @param {ExtendableEvent} event event to wait until on
+ * @param {() => Promise<any>} asyncFn the function to pass to waitUntil
+ * @returns {Promise<any>}
+ */
+function waitUntil (
+	event,
+	asyncFn,
+) {
+	const returnPromise = asyncFn();
+	event.waitUntil(returnPromise);
+	return returnPromise;
+}
+
 /*
 routes take precedence in order listed. if a higher route and a lower route both match a file, the higher route will resolve it
 https://stackoverflow.com/questions/52423473/workbox-routing-registerroute-idempotence
@@ -16,6 +32,9 @@ https://stackoverflow.com/questions/52423473/workbox-routing-registerroute-idemp
 class RevisionCacheFirst extends Strategy {
 	constructor () {
 		super({ cacheName: "runtime-revision" });
+
+		// bind this for activate method
+		this.activate = this.activate.bind(this);
 	}
 
 	/**
@@ -42,6 +61,21 @@ class RevisionCacheFirst extends Strategy {
 		await handler.cachePut(cacheKey, fetchResponse.clone());
 		return fetchResponse;
 	}
+
+	/**
+	 * the cache busting portion of the Strategy.
+	 * Iterate the cache, and remove anything that is not in the manifest, or from a different revision.
+	 *
+	 * call this from the activate event
+	 *
+	 * @param {ExtendableEvent} event
+	 * @returns {Promise}
+	 */
+	activate (event) {
+		return waitUntil(event, async () => {
+			const cache = await caches.open(this.cacheName);
+		});
+	}
 }
 
 /**
@@ -60,10 +94,15 @@ const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST.map(
 		],
 ));
 
+const revisionCacheFirst = new RevisionCacheFirst();
+
 registerRoute(
 	({request}) => runtimeManifest.has(request.url),
-	new RevisionCacheFirst(runtimeManifest),
+	revisionCacheFirst,
 );
+
+// purge the old entries from cache
+addEventListener("activate", revisionCacheFirst.activate);
 
 /*
 this tells workbox to cache fonts and external images, and serve them cache first after first load
