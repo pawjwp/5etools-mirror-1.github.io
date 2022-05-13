@@ -36,7 +36,10 @@ const workboxPrecacheBuildResult = await injectManifest({
 	],
 });
 
-buildResultLog(`workbox manifest "self.__WB_PRECACHE_MANIFEST" injection`, {...workboxPrecacheBuildResult, size: bytesToMb(workboxPrecacheBuildResult.size)});
+buildResultLog(
+	`workbox manifest "self.__WB_PRECACHE_MANIFEST" injection`,
+	{...workboxPrecacheBuildResult, size: bytesToMb(workboxPrecacheBuildResult.size)},
+);
 
 const workboxRuntimeBuildResult = await injectManifest({
 	swSrc: "sw.js",
@@ -44,6 +47,11 @@ const workboxRuntimeBuildResult = await injectManifest({
 	injectionPoint: "self.__WB_RUNTIME_MANIFEST",
 	maximumFileSizeToCacheInBytes: 5 /* mb */ * 1e6,
 	globDirectory: "", // use the current directory - run this script from project root.
+	/*
+	it is less then ideal for these globs to match files that were already matched for pre-caching, but it wont break anything
+	route precedence goes to pre-cache, so they won't fight and double cache the file
+	however, doubly included files bloat the manifest, so ideal to avoid
+	*/
 	globPatterns: [
 		"data/adventure/**/*.json", // matches all adventure json
 	],
@@ -54,7 +62,10 @@ const workboxRuntimeBuildResult = await injectManifest({
 	],
 });
 
-buildResultLog(`workbox manifest "self.__WB_RUNTIME_MANIFEST" injection`, {...workboxRuntimeBuildResult, size: bytesToMb(workboxRuntimeBuildResult.size)});
+buildResultLog(
+	`workbox manifest "self.__WB_RUNTIME_MANIFEST" injection`,
+	{...workboxRuntimeBuildResult, size: bytesToMb(workboxRuntimeBuildResult.size)},
+);
 
 const esbuildBuildResult = await esbuild.build({
 	entryPoints: ["sw.js"],
