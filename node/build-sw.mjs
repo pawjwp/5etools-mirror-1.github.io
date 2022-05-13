@@ -81,7 +81,7 @@ buildResultLog(
 	{...workboxRuntimeBuildResult, size: bytesToMb(workboxRuntimeBuildResult.size)},
 );
 
-const esbuildBuildResult = await esbuild.build({
+const esbuildBuildResultSw = await esbuild.build({
 	entryPoints: ["sw.js"],
 	bundle: true,
 	minify: prod,
@@ -90,4 +90,15 @@ const esbuildBuildResult = await esbuild.build({
 	outfile: "sw.js",
 });
 
-buildResultLog("esbuild bundling", esbuildBuildResult);
+buildResultLog("esbuild bundling sw-template.js", esbuildBuildResultSw);
+
+const esbuildBuildResultSwInjector = await esbuild.build({
+	entryPoints: ["sw-injector-template.js"],
+	bundle: true,
+	minify: prod,
+	drop: prod ? ["console"] : undefined,
+	allowOverwrite: true,
+	outfile: "sw-injector.js",
+});
+
+buildResultLog("esbuild bundling sw-injector-template.js", esbuildBuildResultSwInjector);
