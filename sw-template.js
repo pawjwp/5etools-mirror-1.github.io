@@ -2,7 +2,8 @@
 
 import { precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import { CacheFirst, Strategy, StrategyHandler } from "workbox-strategies";
+import { CacheFirst, NetworkFirst, Strategy, StrategyHandler } from "workbox-strategies";
+import {ExpirationPlugin} from "workbox-expiration";
 
 import { generateURLVariations } from "workbox-precaching/utils/generateURLVariations";
 import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
@@ -135,3 +136,15 @@ this tells workbox to cache fonts, and serve them cache first after first load
 this works on the assumption that fonts are static assets and won't change
  */
 registerRoute(({request}) => request.destination === "font", new CacheFirst());
+
+/*
+the base case route - for images that have fallen through every other route
+this is external images, for homebrew as an example
+*/
+registerRoute(({request}) => request.destination === "image", new NetworkFirst({
+	cacheName: "external-image-cache",
+	plugins: [
+		// this is a safeguard against an utterly massive cache - these numbers may need tweaking
+		new ExpirationPlugin({maxAgeSeconds: 7 /* days */ * 24 * 60 * 60, maxEntries: 100}),
+	],
+}));
