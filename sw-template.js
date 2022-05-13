@@ -74,6 +74,21 @@ class RevisionCacheFirst extends Strategy {
 	activate (event) {
 		return waitUntil(event, async () => {
 			const cache = await caches.open(this.cacheName);
+
+			const currentCacheKeys = (await cache.keys()).map(request => request.url);
+			const validCacheKeys = new Set(Array.from(runtimeManifest).map(([url, revision]) => createCacheKey({url, revision}).cacheKey));
+
+			// queue up all the deletions
+			await Promise.allSettled(
+				currentCacheKeys.map(async key => {
+				// this will happen if a revision is updated or a file is no longer included in the glob
+					if (!validCacheKeys.has(key)) {
+						// we can save space by deleting this element - it wouldn't be served bc the revision is wrong
+						console.log(`deleting ${key} from the cache because its revision does not match`);
+						await cache.delete(key);
+					}
+				}),
+			);
 		});
 	}
 }
