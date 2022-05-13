@@ -29,7 +29,7 @@ https://stackoverflow.com/questions/52423473/workbox-routing-registerroute-idemp
 */
 
 // the self value is replaced with key: value pair of file: hash, to allow workbox to carry files over between caches if they match
-// precacheAndRoute(self.__WB_PRECACHE_MANIFEST);
+precacheAndRoute(self.__WB_PRECACHE_MANIFEST);
 
 class RevisionCacheFirst extends Strategy {
 	constructor () {
@@ -54,6 +54,8 @@ class RevisionCacheFirst extends Strategy {
 		 */
 		const cacheKey = createCacheKey({url, revision: runtimeManifest.get(url)}).cacheKey;
 
+		console.log(`trying to resolve ${url} with key ${cacheKey}`);
+
 		const cacheResponse = await handler.cacheMatch(cacheKey);
 		// undefined is returned if we don't have a cache response for the key
 		if (cacheResponse !== undefined) return cacheResponse;
@@ -65,7 +67,7 @@ class RevisionCacheFirst extends Strategy {
 			await handler.cachePut(cacheKey, fetchResponse.clone());
 			return fetchResponse;
 		} catch (e) {
-			return null;
+			return undefined;
 		}
 	}
 
@@ -115,8 +117,6 @@ const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST.map(
 			revision,
 		],
 ));
-
-console.log(runtimeManifest);
 
 const revisionCacheFirst = new RevisionCacheFirst();
 
