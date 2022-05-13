@@ -59,6 +59,7 @@ class RevisionCacheFirst extends Strategy {
 		if (cacheResponse !== undefined) return cacheResponse;
 
 		// we need to fetch the request from the network and store it with revision for next time
+		console.log(`fetching ${url} over the network for RevisionFirstCache`);
 		const fetchResponse = await handler.fetch(request);
 		await handler.cachePut(cacheKey, fetchResponse.clone());
 		return fetchResponse;
