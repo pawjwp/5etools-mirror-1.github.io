@@ -67,7 +67,9 @@ class RevisionCacheFirst extends Strategy {
 			await handler.cachePut(cacheKey, fetchResponse.clone());
 			return fetchResponse;
 		} catch (e) {
-			return undefined;
+			console.log(`fetch failure - we are offline`);
+			// empty response, we cant get the file
+			return new Response();
 		}
 	}
 
