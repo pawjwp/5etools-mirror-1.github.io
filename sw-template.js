@@ -150,3 +150,7 @@ registerRoute(({request}) => request.destination === "image", new NetworkFirst({
 		new ExpirationPlugin({maxAgeSeconds: 7 /* days */ * 24 * 60 * 60, maxEntries: 100, purgeOnQuotaError: true}),
 	],
 }));
+
+addEventListener("install", () => {
+	self.skipWaiting();
+});
