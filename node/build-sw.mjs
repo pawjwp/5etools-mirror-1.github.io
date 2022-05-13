@@ -57,14 +57,22 @@ const workboxRuntimeBuildResult = await injectManifest({
 	*/
 	globPatterns: [
 		"data/adventure/**/*.json", // matches all adventure json
-		// extensions found with:
-		// find . -type f | awk -F. '!a[$NF]++{print $NF}'
-		"img/**/*.@(png|gif|webm|jpg|webp|jpeg)", // matches all images
+		"img/**/*", // matches all images
+		"icon/*.png", // all icons
+		"*.png", // root images
+		"*.svg", // root svg
 	],
 	manifestTransforms: [
 		(manifest) =>
-			({manifest: manifest.map(entry => [entry.url, entry.revision])}),
-
+			({manifest: manifest.map(
+				entry =>
+					[
+						entry.url
+							// sanitize spaces
+							.replaceAll(" ", "%20"),
+						entry.revision,
+					],
+			)}),
 	],
 });
 

@@ -60,9 +60,13 @@ class RevisionCacheFirst extends Strategy {
 
 		// we need to fetch the request from the network and store it with revision for next time
 		console.log(`fetching ${url} over the network for RevisionFirstCache`);
-		const fetchResponse = await handler.fetch(request);
-		await handler.cachePut(cacheKey, fetchResponse.clone());
-		return fetchResponse;
+		try {
+			const fetchResponse = await handler.fetch(request);
+			await handler.cachePut(cacheKey, fetchResponse.clone());
+			return fetchResponse;
+		} catch (e) {
+			return null;
+		}
 	}
 
 	/**
@@ -112,6 +116,8 @@ const runtimeManifest = new Map(self.__WB_RUNTIME_MANIFEST.map(
 		],
 ));
 
+console.log(runtimeManifest);
+
 const revisionCacheFirst = new RevisionCacheFirst();
 
 registerRoute(
@@ -123,12 +129,7 @@ registerRoute(
 addEventListener("activate", revisionCacheFirst.activate);
 
 /*
-this tells workbox to cache fonts and external images, and serve them cache first after first load
+this tells workbox to cache fonts, and serve them cache first after first load
 this works on the assumption that fonts are static assets and won't change
-this will catch images not from our origin, as those would be caught by the revision first cache
-^^^ it is assumed that external images feature versioning in their url
  */
-
-// a map is more optimal because of v8 turbofan, but it makes for more confusing code
-const cacheSet = new Set(["font", "image"]);
-registerRoute(({request}) => cacheSet.has(request.destination), new CacheFirst());
+registerRoute(({request}) => request.destination === "font", new CacheFirst());
