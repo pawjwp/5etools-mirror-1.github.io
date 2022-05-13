@@ -24,6 +24,14 @@ function waitUntil (
 	return returnPromise;
 }
 
+const offlineAlert = async () => {
+	console.log(`fetch failure - we are offline`);
+	const clients = await self.clients.matchAll({type: "window"});
+	for (const client of clients) {
+		client.postMessage({type: "FETCH_ERROR"});
+	}
+};
+
 /*
 routes take precedence in order listed. if a higher route and a lower route both match a file, the higher route will resolve it
 https://stackoverflow.com/questions/52423473/workbox-routing-registerroute-idempotence
@@ -68,7 +76,7 @@ class RevisionCacheFirst extends Strategy {
 			await handler.cachePut(cacheKey, fetchResponse.clone());
 			return fetchResponse;
 		} catch (e) {
-			console.log(`fetch failure - we are offline`);
+			await offlineAlert();
 			// empty response, we cant get the file
 			return new Response();
 		}
