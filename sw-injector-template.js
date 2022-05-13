@@ -7,8 +7,9 @@ const wb = new Workbox("sw.js");
 
 wb.addEventListener("controlling", () => {
 	JqueryUtil.doToast({
-		content: `${window.location.hostname} has been updated - reload if anything seems wrong`,
+		content: `${window.location.hostname} has been updated - reload to see new content or fix transition issues`,
 		type: "success", // options are warning, info, danger, success
+		autoHideTime: 0,
 	});
 });
 
