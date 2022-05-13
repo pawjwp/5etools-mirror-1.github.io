@@ -135,7 +135,9 @@ addEventListener("activate", revisionCacheFirst.activate);
 this tells workbox to cache fonts, and serve them cache first after first load
 this works on the assumption that fonts are static assets and won't change
  */
-registerRoute(({request}) => request.destination === "font", new CacheFirst());
+registerRoute(({request}) => request.destination === "font", new CacheFirst({
+	cacheName: "font-cache",
+}));
 
 /*
 the base case route - for images that have fallen through every other route
@@ -145,6 +147,6 @@ registerRoute(({request}) => request.destination === "image", new NetworkFirst({
 	cacheName: "external-image-cache",
 	plugins: [
 		// this is a safeguard against an utterly massive cache - these numbers may need tweaking
-		new ExpirationPlugin({maxAgeSeconds: 7 /* days */ * 24 * 60 * 60, maxEntries: 100}),
+		new ExpirationPlugin({maxAgeSeconds: 7 /* days */ * 24 * 60 * 60, maxEntries: 100, purgeOnQuotaError: true}),
 	],
 }));
