@@ -48,7 +48,7 @@ const workboxRuntimeBuildResult = await injectManifest({
 	swSrc: "sw.js",
 	swDest: "sw.js",
 	injectionPoint: "self.__WB_RUNTIME_MANIFEST",
-	maximumFileSizeToCacheInBytes: 5 /* mb */ * 1e6,
+	maximumFileSizeToCacheInBytes: 50 /* mb */ * 1e6,
 	globDirectory: "", // use the current directory - run this script from project root.
 	/*
 	it is less then ideal for these globs to match files that were already matched for pre-caching, but it wont break anything
@@ -57,6 +57,9 @@ const workboxRuntimeBuildResult = await injectManifest({
 	*/
 	globPatterns: [
 		"data/adventure/**/*.json", // matches all adventure json
+		// extensions found with:
+		// find . -type f | awk -F. '!a[$NF]++{print $NF}'
+		"img/**/*.@(png|gif|webm|jpg|webp|jpeg)", // matches all images
 	],
 	manifestTransforms: [
 		(manifest) =>
