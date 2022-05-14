@@ -16,7 +16,7 @@ const throttle = (func, delay) => {
 const fetchError = {
 	"generic": throttle(() => {
 		JqueryUtil.doToast({
-			content: `Failing to fetch some generic content - you are offline and have not viewed this content before. Unexpected behavior may occur`,
+			content: `Failing to fetch some generic content - you are offline and have not viewed this content before. Unexpected behavior may occur.`,
 			type: "warning", // options are warning, info, danger, success
 			autoHideTime: 2_500 /* 2.5 seconds */,
 		});
