@@ -63,9 +63,92 @@ wb.addEventListener("message", event => {
 // event listeners need to be added first
 wb.register();
 
-setTimeout(() => {
+// below here is dragons, display ui for caching state
+
+/**
+ * ask the service worker to runtime cache files that match an array of regex
+ * @param {RegExp[]} routes the route matches to cache based on
+ */
+const swCacheRoutes = (routes) => {
 	wb.messageSW({
 		type: "CACHE_ROUTES",
-		payload: [/test/],
+		payload: routes,
 	});
-}, 1500);
+	JqueryUtil.doToast("warming up to cache!");
+};
+
+// icky global but no bundler, so no other good choice
+globalThis.swCacheRoutes = swCacheRoutes;
+
+/*
+if (NavBar._downloadBarMeta) {
+			if (NavBar._downloadBarMeta) {
+				NavBar._downloadBarMeta.$wrpOuter.remove();
+				NavBar._downloadBarMeta = null;
+			}
+			sendMessage({type: "cache-cancel"});
+		}
+
+		const $dispProgress = $(`<div class="page__disp-download-progress-bar"/>`);
+		const $dispPct = $(`<div class="page__disp-download-progress-text ve-flex-vh-center bold">0%</div>`);
+
+		const $btnCancel = $(`<button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>`)
+			.click(() => {
+				if (NavBar._downloadBarMeta) {
+					NavBar._downloadBarMeta.$wrpOuter.remove();
+					NavBar._downloadBarMeta = null;
+				}
+				sendMessage({type: "cache-cancel"});
+			});
+
+		const $wrpBar = $$`<div class="page__wrp-download-bar w-100 relative mr-2">${$dispProgress}${$dispPct}</div>`;
+		const $wrpOuter = $$`<div class="page__wrp-download">
+			${$wrpBar}
+			${$btnCancel}
+		</div>`.appendTo(document.body);
+
+		NavBar._downloadBarMeta = {$wrpOuter, $wrpBar, $dispProgress, $dispPct};
+
+		// Trigger the service worker to cache everything
+		messageChannel.port1.onmessage = e => {
+			const msg = e.data;
+			switch (msg.type) {
+				case "download-continue": {
+					if (!NavBar._downloadBarMeta) return;
+
+					sendMessage({type: "cache-continue", data: {index: msg.data.index}});
+
+					break;
+				}
+				case "download-progress": {
+					if (!NavBar._downloadBarMeta) return;
+
+					NavBar._downloadBarMeta.$dispProgress.css("width", msg.data.pct);
+					NavBar._downloadBarMeta.$dispPct.text(msg.data.pct);
+
+					break;
+				}
+				case "download-cancelled": {
+					if (!NavBar._downloadBarMeta) return;
+
+					NavBar._downloadBarMeta.$wrpOuter.remove();
+					NavBar._downloadBarMeta = null;
+
+					break;
+				}
+				case "download-error": {
+					setTimeout(() => { throw new Error(msg.message); });
+
+					if (!NavBar._downloadBarMeta) return;
+
+					NavBar._downloadBarMeta.$wrpBar.addClass("page__wrp-download-bar--error");
+					NavBar._downloadBarMeta.$dispProgress.addClass("page__disp-download-progress-bar--error");
+					NavBar._downloadBarMeta.$dispPct.text("Error!");
+
+					JqueryUtil.doToast(`An error occurred. ${VeCt.STR_SEE_CONSOLE}`);
+
+					break;
+				}
+			}
+		};
+		*/

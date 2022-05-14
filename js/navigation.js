@@ -674,7 +674,6 @@ NavBar._timersOpen = {};
 NavBar._timersClose = {};
 NavBar._timerMousePos = {};
 NavBar._cachedInstallEvent = null;
-NavBar._downloadBarMeta = null;
 
 NavBar.InteractionManager = class {
 	static _onClick_button_dayNight (evt) {
@@ -731,103 +730,12 @@ NavBar.InteractionManager = class {
 	static async _pOnClick_button_preloadOffline (evt) {
 		evt.preventDefault();
 
-		if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+		if (globalThis.swCacheRoutes === undefined) {
 			JqueryUtil.doToast(`The loader was not yet available! Reload the page and try again. If this problem persists, your browser may not support preloading.`);
 			return;
 		}
 
-		// a pipe with has "port1" and "port2" props; we'll send "port2" to the service worker so it can
-		//   send messages back down the pipe to us
-		const messageChannel = new MessageChannel();
-		let hasSentPort = false;
-		const sendMessage = (data) => {
-			try {
-				// Only send the MessageChannel port once, as the first send will transfer ownership of the
-				//   port over to the service worker (and we can no longer access it to even send it)
-				if (!hasSentPort) {
-					hasSentPort = true;
-					navigator.serviceWorker.controller.postMessage(data, [messageChannel.port2]);
-				} else {
-					navigator.serviceWorker.controller.postMessage(data);
-				}
-			} catch (e) {
-				// Ignore errors
-				setTimeout(() => { throw e; });
-			}
-		};
-
-		if (NavBar._downloadBarMeta) {
-			if (NavBar._downloadBarMeta) {
-				NavBar._downloadBarMeta.$wrpOuter.remove();
-				NavBar._downloadBarMeta = null;
-			}
-			sendMessage({type: "cache-cancel"});
-		}
-
-		const $dispProgress = $(`<div class="page__disp-download-progress-bar"/>`);
-		const $dispPct = $(`<div class="page__disp-download-progress-text ve-flex-vh-center bold">0%</div>`);
-
-		const $btnCancel = $(`<button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>`)
-			.click(() => {
-				if (NavBar._downloadBarMeta) {
-					NavBar._downloadBarMeta.$wrpOuter.remove();
-					NavBar._downloadBarMeta = null;
-				}
-				sendMessage({type: "cache-cancel"});
-			});
-
-		const $wrpBar = $$`<div class="page__wrp-download-bar w-100 relative mr-2">${$dispProgress}${$dispPct}</div>`;
-		const $wrpOuter = $$`<div class="page__wrp-download">
-			${$wrpBar}
-			${$btnCancel}
-		</div>`.appendTo(document.body);
-
-		NavBar._downloadBarMeta = {$wrpOuter, $wrpBar, $dispProgress, $dispPct};
-
-		// Trigger the service worker to cache everything
-		messageChannel.port1.onmessage = e => {
-			const msg = e.data;
-			switch (msg.type) {
-				case "download-continue": {
-					if (!NavBar._downloadBarMeta) return;
-
-					sendMessage({type: "cache-continue", data: {index: msg.data.index}});
-
-					break;
-				}
-				case "download-progress": {
-					if (!NavBar._downloadBarMeta) return;
-
-					NavBar._downloadBarMeta.$dispProgress.css("width", msg.data.pct);
-					NavBar._downloadBarMeta.$dispPct.text(msg.data.pct);
-
-					break;
-				}
-				case "download-cancelled": {
-					if (!NavBar._downloadBarMeta) return;
-
-					NavBar._downloadBarMeta.$wrpOuter.remove();
-					NavBar._downloadBarMeta = null;
-
-					break;
-				}
-				case "download-error": {
-					setTimeout(() => { throw new Error(msg.message); });
-
-					if (!NavBar._downloadBarMeta) return;
-
-					NavBar._downloadBarMeta.$wrpBar.addClass("page__wrp-download-bar--error");
-					NavBar._downloadBarMeta.$dispProgress.addClass("page__disp-download-progress-bar--error");
-					NavBar._downloadBarMeta.$dispPct.text("Error!");
-
-					JqueryUtil.doToast(`An error occurred. ${VeCt.STR_SEE_CONSOLE}`);
-
-					break;
-				}
-			}
-		};
-
-		sendMessage({type: "cache-start"});
+		globalThis.swCacheRoutes([/adventures/]);
 	}
 };
 
