@@ -87,7 +87,7 @@ class RevisionCacheFirst extends Strategy {
 		this.activate = this.activate.bind(this);
 		this.cacheRoutes = this.cacheRoutes.bind(this);
 		addEventListener("message", (event) => {
-			if (event.data.type === "CACHE_ROUTES") event.waitUntil(this.cacheRoutes(event.data, event.source));
+			if (event.data.type === "CACHE_ROUTES") event.waitUntil(this.cacheRoutes(event.data));
 		});
 	}
 
@@ -160,9 +160,8 @@ class RevisionCacheFirst extends Strategy {
 	/**
 	 *
 	 * @param {{payload: {routeRegex: RegExp}}} data the data sent with the request
-	 * @param {MessagePort} source the source of the event, to give updates to
 	 */
-	async cacheRoutes (data, source) {
+	async cacheRoutes (data) {
 		const cache = await caches.open(this.cacheName);
 
 		const currentCacheKeys = new Set((await cache.keys()).map(request => request.url));
@@ -180,10 +179,18 @@ class RevisionCacheFirst extends Strategy {
 		const fetchTotal = routesToCache.length;
 		let fetched = 0;
 
+		/**
+		 * This is an async function to let clients know the status of route caching.
+		 * It can take up to a ms, so it can be called without an await to let it resolve in downtime.
+		 */
 		const postProgress = async () => {
-			source.postMessage({type: "CACHE_ROUTES_PROGRESS", payload: {fetched, fetchTotal}});
+			const clients = await self.clients.matchAll({type: "window"});
+			for (const client of clients) {
+				client.postMessage({type: "CACHE_ROUTES_PROGRESS", payload: {fetched, fetchTotal}});
+			}
 		};
 
+		// First call, and awaited, so that pages show a loading bar to indicate fetching has started
 		await postProgress();
 
 		/**
