@@ -17,17 +17,17 @@ const fetchError = throttle(() => {
 	JqueryUtil.doToast({
 		content: `Failing to fetch some content - you are offline and have not viewed this content before`,
 		type: "warning", // options are warning, info, danger, success
-		autoHideTime: 2_500,
+		autoHideTime: 2_500 /* 2.5 seconds */,
 	});
-}, 600_000 /* 10 minutes */);
+}, 15_000 /* 15 seconds */);
 
 const wb = new Workbox("sw.js");
 
 wb.addEventListener("controlling", () => {
 	JqueryUtil.doToast({
-		content: `${window.location.hostname} has been updated - reload to see new content or fix transition issues`,
+		content: `${window.location.hostname} has been updated - reload this page to see new content or fix transition issues`,
 		type: "success", // options are warning, info, danger, success
-		autoHideTime: 0,
+		autoHideTime: 0, // never auto hide - this warning is important
 	});
 });
 
