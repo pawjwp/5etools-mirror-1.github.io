@@ -13,13 +13,31 @@ const throttle = (func, delay) => {
 	};
 };
 
-const fetchError = throttle(() => {
-	JqueryUtil.doToast({
-		content: `Failing to fetch some content - you are offline and have not viewed this content before`,
-		type: "warning", // options are warning, info, danger, success
-		autoHideTime: 2_500 /* 2.5 seconds */,
-	});
-}, 15_000 /* 15 seconds */);
+const fetchError = {
+	"generic": throttle(() => {
+		JqueryUtil.doToast({
+			content: `Failing to fetch some generic content - you are offline and have not viewed this content before. Unexpected behavior may occur`,
+			type: "warning", // options are warning, info, danger, success
+			autoHideTime: 2_500 /* 2.5 seconds */,
+		});
+	}, 10_000 /* 10 seconds */),
+
+	"json": throttle(() => {
+		JqueryUtil.doToast({
+			content: `Failing to fetch data - you are offline and have not viewed this content before. This page is likely to fail to load or behave strangely.`,
+			type: "danger", // options are warning, info, danger, success
+			autoHideTime: 9_000 /* 9 seconds */,
+		});
+	}, 2_000 /* 2 seconds */),
+
+	"image": throttle(() => {
+		JqueryUtil.doToast({
+			content: `Failing to fetch images - you are offline and have not viewed this content before. Pages should load, but some images may be substituted for placeholders.`,
+			type: "info", // options are warning, info, danger, success
+			autoHideTime: 5_000 /* 5 seconds */,
+		});
+	}, 60_000 /* 60 seconds */),
+};
 
 const wb = new Workbox("sw.js");
 
@@ -32,9 +50,10 @@ wb.addEventListener("controlling", () => {
 });
 
 wb.addEventListener("message", event => {
-	switch (event.data.type) {
+	const msg = event.data;
+	switch (msg.type) {
 		case "FETCH_ERROR":
-			fetchError();
+			fetchError[msg.data]();
 			break;
 		default:
 	}

@@ -24,11 +24,15 @@ function waitUntil (
 	return returnPromise;
 }
 
-const offlineAlert = async () => {
-	console.log(`fetch failure - we are offline`);
+const offlineAlert = async (url) => {
+	console.log(`fetch failure - we are offline, cannot access ${url}`);
 	const clients = await self.clients.matchAll({type: "window"});
+	let data = "generic";
+	if (/\.(?:png|gif|webm|jpg|webp|jpeg|svg)$/m.test(url)) data = "image";
+	else if (/\.json$/m.test(url)) data = "json";
+
 	for (const client of clients) {
-		client.postMessage({type: "FETCH_ERROR"});
+		client.postMessage({type: "FETCH_ERROR", data});
 	}
 };
 
@@ -76,7 +80,7 @@ class RevisionCacheFirst extends Strategy {
 			await handler.cachePut(cacheKey, fetchResponse.clone());
 			return fetchResponse;
 		} catch (e) {
-			await offlineAlert();
+			await offlineAlert(url);
 			// empty response, we cant get the file
 			return new Response();
 		}
