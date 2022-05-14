@@ -87,7 +87,7 @@ class RevisionCacheFirst extends Strategy {
 		this.activate = this.activate.bind(this);
 		this.cacheRoutes = this.cacheRoutes.bind(this);
 		addEventListener("message", (event) => {
-			if (event.data.type === "CACHE_ROUTES") event.waitUntil(this.cacheRoutes(event.data));
+			if (event.data.type === "CACHE_ROUTES") event.waitUntil(this.cacheRoutes(event.data, event.source));
 		});
 	}
 
@@ -157,7 +157,12 @@ class RevisionCacheFirst extends Strategy {
 		});
 	}
 
-	async cacheRoutes (data) {
+	/**
+	 *
+	 * @param {{payload: {routeRegex: RegExp}}} data the data sent with the request
+	 * @param {MessageEventSource} source the source of the event, to give updates to
+	 */
+	async cacheRoutes (data, source) {
 		const cache = await caches.open(this.cacheName);
 
 		const currentCacheKeys = new Set((await cache.keys()).map(request => request.url));
