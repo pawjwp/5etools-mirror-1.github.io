@@ -207,11 +207,16 @@ class RevisionCacheFirst extends Strategy {
 		};
 
 		const fetchPromises = [];
+
+		console.time(`concurrent fetching with up to ${concurrentFetches} fetches open at once`);
+
 		for (let i = 0; i < concurrentFetches; i++) {
 			fetchPromises.push(fetchPromise());
 		}
 
 		await Promise.allSettled(fetchPromises);
+
+		console.timeEnd(`concurrent fetching with up to ${concurrentFetches} fetches open at once`);
 	}
 }
 
