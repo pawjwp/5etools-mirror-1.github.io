@@ -158,6 +158,17 @@ class RevisionCacheFirst extends Strategy {
 	}
 
 	/**
+	 * Preload runtime cache routes. This method is called based on a message from the "frontend".
+	 * The method is passed a regex which all possible files are matched against.
+	 * Files which match and have not already been loaded will be attempted to be fetched.
+	 *
+	 * File fetching is done with a pool strategy, where async function closures pop urls off an array.
+	 * If a fetch throws an error, it will not be retried, and it will kill the worker.
+	 * This intentionally reduces the number of concurrent requests.
+	 * If a system or server is struggling under the load, it could cause fetches to fail,
+	 * in a manner that is opaque to this code.
+	 *
+	 * When all the original workers have died or finished, any failures will be reported.
 	 *
 	 * @param {{payload: {routeRegex: RegExp}}} data the data sent with the request
 	 */
@@ -167,21 +178,18 @@ class RevisionCacheFirst extends Strategy {
 		const currentCacheKeys = new Set((await cache.keys()).map(request => request.url));
 		const validCacheKeys = Array.from(runtimeManifest).map(([url, revision]) => createCacheKey({url, revision}).cacheKey);
 
-		/**
-		 * These are the keys which have not been cached yet, and are able to be matched against
-		 */
-		const uncachedKeys = validCacheKeys.filter((key) => !currentCacheKeys.has(key));
-
 		const routeRegex = data.payload.routeRegex;
-
-		const routesToCache = uncachedKeys.filter((key) => routeRegex.test(key));
+		/**
+		 * These are the keys which have not been cached yet AND match the regex for routes
+		 */
+		const routesToCache = validCacheKeys.filter((key) => !currentCacheKeys.has(key) && routeRegex.test(key));
 
 		const fetchTotal = routesToCache.length;
 		let fetched = 0;
 
 		/**
 		 * This is an async function to let clients know the status of route caching.
-		 * It can take up to a ms, so it can be called without an await to let it resolve in downtime.
+		 * It can take up to 1 ms, so it can be called without an await to let it resolve in downtime.
 		 */
 		const postProgress = async () => {
 			const clients = await self.clients.matchAll({type: "window"});
@@ -207,21 +215,24 @@ class RevisionCacheFirst extends Strategy {
 				// this regex is a very bad idea, but it trims the cache version off the url
 				const cleanUrl = url.replace(/\?__WB_REVISION__=\w+$/m, "");
 				const response = await fetch(cleanUrl);
+				// this await could be omitted to further speed up fetching at risk of failure during error
 				await cache.put(url, response);
 				fetched++;
 				postProgress();
 			}
 		};
 
+		// an array / pool of functions who will fetch files and cache them
 		const fetchPromises = [];
-
 		for (let i = 0; i < concurrentFetches; i++) {
 			fetchPromises.push(fetchPromise());
 		}
 
+		// wait for each function to die, or empty the routesToCache
 		const fetchResults = await Promise.allSettled(fetchPromises);
-		const errorResults = fetchResults.filter(fetchResult => fetchResult.status === "rejected");
 
+		// determine if any functions died and report them
+		const errorResults = fetchResults.filter(fetchResult => fetchResult.status === "rejected");
 		if (errorResults.length > 0) {
 			const clients = await self.clients.matchAll({type: "window"});
 			for (const client of clients) client.postMessage({type: "CACHE_ROUTES_ERROR", payload: { errors: errorResults }});
