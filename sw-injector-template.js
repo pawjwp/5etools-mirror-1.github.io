@@ -62,3 +62,10 @@ wb.addEventListener("message", event => {
 // this is where we tell the service worker to start - after the page has loaded
 // event listeners need to be added first
 wb.register();
+
+setTimeout(() => {
+	wb.messageSW({
+		type: "CACHE_ROUTES",
+		payload: [/test/],
+	});
+}, 1500);

@@ -86,6 +86,10 @@ class RevisionCacheFirst extends Strategy {
 
 		// bind this for activate method
 		this.activate = this.activate.bind(this);
+		this.cacheRoutes = this.cacheRoutes.bind(this);
+		addEventListener("message", (event) => {
+			if (event.data.type === "CACHE_ROUTES") event.waitUntil(this.cacheRoutes(event.data));
+		});
 	}
 
 	/**
@@ -152,6 +156,10 @@ class RevisionCacheFirst extends Strategy {
 				}),
 			);
 		});
+	}
+
+	async cacheRoutes (data) {
+		console.log(data);
 	}
 }
 
