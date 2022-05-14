@@ -49,16 +49,6 @@ wb.addEventListener("controlling", () => {
 	});
 });
 
-wb.addEventListener("message", event => {
-	const msg = event.data;
-	switch (msg.type) {
-		case "FETCH_ERROR":
-			fetchError[msg.payload]();
-			break;
-		default:
-	}
-});
-
 // this is where we tell the service worker to start - after the page has loaded
 // event listeners need to be added first
 wb.register();
@@ -66,13 +56,13 @@ wb.register();
 // below here is dragons, display ui for caching state
 
 /**
- * ask the service worker to runtime cache files that match an array of regex
- * @param {RegExp[]} routes the route matches to cache based on
+ * ask the service worker to runtime cache files that match a regex
+ * @param {RegExp} routeRegex the regex to use to determine if a file should be cached
  */
-const swCacheRoutes = (routes) => {
+const swCacheRoutes = (routeRegex) => {
 	wb.messageSW({
 		type: "CACHE_ROUTES",
-		payload: routes,
+		payload: { routeRegex },
 	});
 	JqueryUtil.doToast("warming up to cache!");
 };
@@ -152,3 +142,13 @@ if (NavBar._downloadBarMeta) {
 			}
 		};
 		*/
+
+wb.addEventListener("message", event => {
+	const msg = event.data;
+	switch (msg.type) {
+		case "FETCH_ERROR":
+			fetchError[msg.payload]();
+			break;
+		default:
+	}
+});

@@ -5,7 +5,6 @@ import { registerRoute } from "workbox-routing";
 import { CacheFirst, NetworkFirst, Strategy, StrategyHandler } from "workbox-strategies";
 import {ExpirationPlugin} from "workbox-expiration";
 
-import { generateURLVariations } from "workbox-precaching/utils/generateURLVariations";
 import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
 
 /*
@@ -159,7 +158,37 @@ class RevisionCacheFirst extends Strategy {
 	}
 
 	async cacheRoutes (data) {
-		console.log(data);
+		const cache = await caches.open(this.cacheName);
+
+		const currentCacheKeys = new Set((await cache.keys()).map(request => request.url));
+		const validCacheKeys = Array.from(runtimeManifest).map(([url, revision]) => createCacheKey({url, revision}).cacheKey);
+
+		/**
+		 * These are the keys which have not been cached yet, and are able to be matched against
+		 */
+		const uncachedKeys = validCacheKeys.filter((key) => !currentCacheKeys.has(key));
+
+		const routeRegex = data.payload.routeRegex;
+
+		const routesToCache = uncachedKeys.filter((key) => routeRegex.test(key));
+
+		const fetchTotal = routesToCache.length;
+		let fetched = 0;
+
+		const callback = async () => {
+			console.log((fetched / fetchTotal) * 100);
+		};
+
+		const fetchArray = routesToCache.map(async (url) => {
+			// this regex is a very bad idea, but it trims the cache version off the url
+			const cleanUrl = url.replace(/\?__WB_REVISION__=\w+$/m, "");
+			const response = await fetch(cleanUrl);
+			await cache.put(url, response);
+			fetched++;
+			callback();
+		});
+
+		await Promise.all(fetchArray);
 	}
 }
 

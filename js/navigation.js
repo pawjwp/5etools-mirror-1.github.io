@@ -735,7 +735,7 @@ NavBar.InteractionManager = class {
 			return;
 		}
 
-		globalThis.swCacheRoutes([/adventures/]);
+		globalThis.swCacheRoutes(/(?:data|img)\/adventure/);
 	}
 };
 
