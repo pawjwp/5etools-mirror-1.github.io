@@ -63,12 +63,12 @@ function waitUntil (
 const offlineAlert = async (url) => {
 	console.log(`fetch failure - we are offline, cannot access ${url}`);
 	const clients = await self.clients.matchAll({type: "window"});
-	let data = "generic";
-	if (/\.(?:png|gif|webm|jpg|webp|jpeg|svg)$/m.test(url)) data = "image";
-	else if (/\.json$/m.test(url)) data = "json";
+	let payload = "generic";
+	if (/\.(?:png|gif|webm|jpg|webp|jpeg|svg)$/m.test(url)) payload = "image";
+	else if (/\.json$/m.test(url)) payload = "json";
 
 	for (const client of clients) {
-		client.postMessage({type: "FETCH_ERROR", data});
+		client.postMessage({type: "FETCH_ERROR", payload});
 	}
 };
 

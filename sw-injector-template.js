@@ -53,7 +53,7 @@ wb.addEventListener("message", event => {
 	const msg = event.data;
 	switch (msg.type) {
 		case "FETCH_ERROR":
-			fetchError[msg.data]();
+			fetchError[msg.payload]();
 			break;
 		default:
 	}
