@@ -64,7 +64,7 @@ const swCacheRoutes = (routeRegex) => {
 		type: "CACHE_ROUTES",
 		payload: { routeRegex },
 	});
-	JqueryUtil.doToast("warming up to cache!");
+	JqueryUtil.doToast({content: "warming up!", autoHideTime: 500});
 };
 
 // icky global but no bundler, so no other good choice
@@ -123,14 +123,29 @@ const updateDownloadBar = (msg) => {
 			break;
 
 		case "CACHE_ROUTES_ERROR":
-			setTimeout(() => { throw new Error(msg.payload.error); });
+			for (const error of msg.payload.errors) {
+				// eslint-disable-next-line no-console
+				console.error(error);
+			}
 
 			downloadBar.$wrapBar.addClass("page__wrp-download-bar--error");
 			downloadBar.$displayProgress.addClass("page__disp-download-progress-bar--error");
 			downloadBar.$displayPercent.text("Error!");
 
-			JqueryUtil.doToast(`An error occurred while preloading data. ${VeCt.STR_SEE_CONSOLE}`);
-
+			setTimeout(() => {
+				removeDownloadBar();
+				JqueryUtil.doToast(
+					{
+						type: "warning",
+						autoHideTime: 15_000,
+						content:
+					`An error occurred while preloading data.
+					You may have gone offline, or the server may have been overwhelmed?
+					Feel free to retry the preload.
+					Progress made was saved. ${VeCt.STR_SEE_CONSOLE}`,
+					},
+				);
+			}, 2_000);
 			break;
 	}
 };

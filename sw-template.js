@@ -215,15 +215,17 @@ class RevisionCacheFirst extends Strategy {
 
 		const fetchPromises = [];
 
-		console.time(`concurrent fetching with up to ${concurrentFetches} fetches open at once`);
-
 		for (let i = 0; i < concurrentFetches; i++) {
 			fetchPromises.push(fetchPromise());
 		}
 
-		await Promise.allSettled(fetchPromises);
+		const fetchResults = await Promise.allSettled(fetchPromises);
+		const errorResults = fetchResults.filter(fetchResult => fetchResult.status === "rejected");
 
-		console.timeEnd(`concurrent fetching with up to ${concurrentFetches} fetches open at once`);
+		if (errorResults.length > 0) {
+			const clients = await self.clients.matchAll({type: "window"});
+			for (const client of clients) client.postMessage({type: "CACHE_ROUTES_ERROR", payload: { errors: errorResults }});
+		}
 	}
 }
 
