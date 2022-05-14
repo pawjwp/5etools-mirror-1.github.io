@@ -70,86 +70,88 @@ const swCacheRoutes = (routeRegex) => {
 // icky global but no bundler, so no other good choice
 globalThis.swCacheRoutes = swCacheRoutes;
 
-/*
-if (NavBar._downloadBarMeta) {
-			if (NavBar._downloadBarMeta) {
-				NavBar._downloadBarMeta.$wrpOuter.remove();
-				NavBar._downloadBarMeta = null;
-			}
-			sendMessage({type: "cache-cancel"});
-		}
+let downloadBar = null;
 
-		const $dispProgress = $(`<div class="page__disp-download-progress-bar"/>`);
-		const $dispPct = $(`<div class="page__disp-download-progress-text ve-flex-vh-center bold">0%</div>`);
+/**
+ * Remove the download bar from the dom, and null downloadBar.
+ */
+const removeDownloadBar = () => {
+	downloadBar.$wrapOuter.remove();
+	downloadBar = null;
+};
 
-		const $btnCancel = $(`<button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>`)
-			.click(() => {
-				if (NavBar._downloadBarMeta) {
-					NavBar._downloadBarMeta.$wrpOuter.remove();
-					NavBar._downloadBarMeta = null;
-				}
-				sendMessage({type: "cache-cancel"});
-			});
+/**
+ * Add the download bar to the dom, and write the jQuery object to downloadBar.
+ * Bind event handlers.
+ */
+const initDownloadBar = () => {
+	if (downloadBar !== null) removeDownloadBar();
 
-		const $wrpBar = $$`<div class="page__wrp-download-bar w-100 relative mr-2">${$dispProgress}${$dispPct}</div>`;
-		const $wrpOuter = $$`<div class="page__wrp-download">
-			${$wrpBar}
+	const $displayProgress = $(`<div class="page__disp-download-progress-bar"/>`);
+	const $displayPercent = $(`<div class="page__disp-download-progress-text ve-flex-vh-center bold">0%</div>`);
+
+	const $btnCancel = $(`<button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>`)
+		.click(() => {
+			removeDownloadBar();
+			// sendMessage({type: "cache-cancel"});
+		});
+
+	const $wrapBar = $$`<div class="page__wrp-download-bar w-100 relative mr-2">${$displayProgress}${$displayPercent}</div>`;
+	const $wrapOuter = $$`<div class="page__wrp-download">
+			${$wrapBar}
 			${$btnCancel}
 		</div>`.appendTo(document.body);
 
-		NavBar._downloadBarMeta = {$wrpOuter, $wrpBar, $dispProgress, $dispPct};
+	downloadBar = {$wrapOuter, $wrapBar, $displayProgress, $displayPercent};
+};
 
-		// Trigger the service worker to cache everything
-		messageChannel.port1.onmessage = e => {
-			const msg = e.data;
-			switch (msg.type) {
-				case "download-continue": {
-					if (!NavBar._downloadBarMeta) return;
+/**
+ * Update the ui of the download bar based on a new message from the service worker. If there is no download bar, make one.
+ * @param {{type: string, payload: Object}} msg the message from the sw
+ */
+const updateDownloadBar = (msg) => {
+	if (downloadBar === null) initDownloadBar();
 
-					sendMessage({type: "cache-continue", data: {index: msg.data.index}});
+	switch (msg.type) {
+		case "CACHE_ROUTES_PROGRESS":
+			// eslint-disable-next-line no-case-declarations
+			const percent = `${(100 * (msg.payload.fetched / msg.payload.fetchTotal)).toFixed(3)}%`;
+			downloadBar.$displayProgress.css("width", percent);
+			downloadBar.$displayPercent.text(percent);
+			// do a toast and cleanup if every single file has been downloaded.
+			if (msg.payload.fetched === msg.payload.fetchTotal) finishedDownload();
+			break;
 
-					break;
-				}
-				case "download-progress": {
-					if (!NavBar._downloadBarMeta) return;
+		case "CACHE_ROUTES_ERROR":
+			setTimeout(() => { throw new Error(msg.payload.error); });
 
-					NavBar._downloadBarMeta.$dispProgress.css("width", msg.data.pct);
-					NavBar._downloadBarMeta.$dispPct.text(msg.data.pct);
+			downloadBar.$wrapBar.addClass("page__wrp-download-bar--error");
+			downloadBar.$displayProgress.addClass("page__disp-download-progress-bar--error");
+			downloadBar.$displayPercent.text("Error!");
 
-					break;
-				}
-				case "download-cancelled": {
-					if (!NavBar._downloadBarMeta) return;
+			JqueryUtil.doToast(`An error occurred while preloading data. ${VeCt.STR_SEE_CONSOLE}`);
 
-					NavBar._downloadBarMeta.$wrpOuter.remove();
-					NavBar._downloadBarMeta = null;
+			break;
+	}
+};
 
-					break;
-				}
-				case "download-error": {
-					setTimeout(() => { throw new Error(msg.message); });
-
-					if (!NavBar._downloadBarMeta) return;
-
-					NavBar._downloadBarMeta.$wrpBar.addClass("page__wrp-download-bar--error");
-					NavBar._downloadBarMeta.$dispProgress.addClass("page__disp-download-progress-bar--error");
-					NavBar._downloadBarMeta.$dispPct.text("Error!");
-
-					JqueryUtil.doToast(`An error occurred. ${VeCt.STR_SEE_CONSOLE}`);
-
-					break;
-				}
-			}
-		};
-		*/
+/**
+ * Call when the progress is 100%, to remove the bar and do a toast
+ */
+const finishedDownload = () => {
+	removeDownloadBar();
+	JqueryUtil.doToast({type: "success", content: "Preload finished. The content is now ready to view offline."});
+};
 
 wb.addEventListener("message", event => {
 	const msg = event.data;
-	console.log(msg);
 	switch (msg.type) {
 		case "FETCH_ERROR":
 			fetchError[msg.payload]();
 			break;
-		default:
+		case "CACHE_ROUTES_PROGRESS":
+		case "CACHE_ROUTES_ERROR":
+			updateDownloadBar(msg);
+			break;
 	}
 });
