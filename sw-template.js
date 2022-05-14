@@ -113,10 +113,12 @@ class RevisionCacheFirst extends Strategy {
 		console.log(`fetching ${url} over the network for RevisionFirstCache`);
 		try {
 			const fetchResponse = await handler.fetch(request);
-			await handler.cachePut(cacheKey, fetchResponse.clone());
+			// no await because it can happen later
+			handler.cachePut(cacheKey, fetchResponse.clone());
 			return fetchResponse;
 		} catch (e) {
-			await offlineAlert(url);
+			// no await because it can happen later
+			offlineAlert(url);
 			// empty response, we cant get the file
 			return new Response();
 		}
