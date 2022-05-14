@@ -8,6 +8,42 @@ import {ExpirationPlugin} from "workbox-expiration";
 import { generateURLVariations } from "workbox-precaching/utils/generateURLVariations";
 import { createCacheKey } from "workbox-precaching/utils/createCacheKey";
 
+/*
+this comment will attempt to explain the caching strategy employed by this service worker
+
+at a high level, it strives to enable a good compromise of speed and freshness without surprising behavior
+
+the runtime manifest provides hashes for the files it contains, preventing stale files from being served.
+
+when loaded, the sw will:
+	purge any files in the precache that are no longer in the manifest
+	fetch any files that are missing from the precache
+	purge any files in the runtime cache that have a different revision from the manifest
+	purge any images in the external-images cache that have not been recently accessed (7 days)
+
+routes are resolved in descending order.
+any file request:
+	Is it in the Precache Manifest (essential files: script, html, css, some fonts, most data)?
+		serve it from the cache
+
+	Is it in the Runtime Manifest (optional files: images and adventure data)?
+		Has it been cached?
+			yes: serve it from the cache
+			no:	 fetch it from the network and cache it
+
+	Is it a font?
+		Is it in the font-cache?
+			yes: serve it from the font cache
+			no:  fetch it from the network and cache it
+
+	Is it an image (external images)?
+		Fetch it from the network, and cache it
+		If the fetch fails, serve from the cache
+
+	Default is load from network.
+	A file request not caught by any above policy won't be available offline.
+*/
+
 // nabbed from https://github.com/GoogleChrome/workbox/blob/0cc6975f17b60d67a71d8b717e73ef7ddb79a891/packages/workbox-core/src/_private/waitUntil.ts#L19-L26
 /**
  * wait until an event happens
