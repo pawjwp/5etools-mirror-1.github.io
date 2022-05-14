@@ -202,3 +202,16 @@ registerRoute(({request}) => request.destination === "image", new NetworkFirst({
 addEventListener("install", () => {
 	self.skipWaiting();
 });
+
+// this only serves to delete cache from old versions of page - pre sw rework
+addEventListener("activate", event => {
+	event.waitUntil((async () => {
+		const cacheNames = await caches.keys();
+		for (const cacheName of cacheNames) {
+			if (/\d+\.\d+\.\d+/.test(cacheName)) {
+				await caches.delete(cacheName);
+				console.log(`deleted cache: ${cacheName} because it is from old service worker`);
+			}
+		}
+	})());
+});
