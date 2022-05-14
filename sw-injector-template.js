@@ -145,6 +145,7 @@ if (NavBar._downloadBarMeta) {
 
 wb.addEventListener("message", event => {
 	const msg = event.data;
+	console.log(msg);
 	switch (msg.type) {
 		case "FETCH_ERROR":
 			fetchError[msg.payload]();

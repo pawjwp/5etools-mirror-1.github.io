@@ -160,7 +160,7 @@ class RevisionCacheFirst extends Strategy {
 	/**
 	 *
 	 * @param {{payload: {routeRegex: RegExp}}} data the data sent with the request
-	 * @param {MessageEventSource} source the source of the event, to give updates to
+	 * @param {MessagePort} source the source of the event, to give updates to
 	 */
 	async cacheRoutes (data, source) {
 		const cache = await caches.open(this.cacheName);
@@ -180,20 +180,38 @@ class RevisionCacheFirst extends Strategy {
 		const fetchTotal = routesToCache.length;
 		let fetched = 0;
 
-		const callback = async () => {
-			console.log((fetched / fetchTotal) * 100);
+		const postProgress = async () => {
+			source.postMessage({type: "CACHE_ROUTES_PROGRESS", payload: {fetched, fetchTotal}});
 		};
 
-		const fetchArray = routesToCache.map(async (url) => {
-			// this regex is a very bad idea, but it trims the cache version off the url
-			const cleanUrl = url.replace(/\?__WB_REVISION__=\w+$/m, "");
-			const response = await fetch(cleanUrl);
-			await cache.put(url, response);
-			fetched++;
-			callback();
-		});
+		await postProgress();
 
-		await Promise.all(fetchArray);
+		/**
+		 * The number of fetches to run at the same time
+		 */
+		const concurrentFetches = 5;
+
+		const fetchPromise = async () => {
+			while (true) {
+				// each instance of this function will keep popping urls off the array until there are none left
+				const url = routesToCache.pop();
+				if (url === undefined) return;
+
+				// this regex is a very bad idea, but it trims the cache version off the url
+				const cleanUrl = url.replace(/\?__WB_REVISION__=\w+$/m, "");
+				const response = await fetch(cleanUrl);
+				await cache.put(url, response);
+				fetched++;
+				postProgress();
+			}
+		};
+
+		const fetchPromises = [];
+		for (let i = 0; i < concurrentFetches; i++) {
+			fetchPromises.push(fetchPromise());
+		}
+
+		await Promise.allSettled(fetchPromises);
 	}
 }
 
