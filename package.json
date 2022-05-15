@@ -20,8 +20,9 @@
 		"build:deploy:prod": "bash build/deploy-prep-prod.sh",
 		"build:deploy:prod:cdn": "bash build/deploy-prep-prod--cdn.sh",
 		"build:seo": "node node/generate-seo.js",
-		"build:sw": "node node/generate-service-worker.js",
-		"build": "npm run clean-jsons && npm run gen-all && npm run build:css && npm run build:sw",
+		"build:sw": "node node/build-sw.mjs",
+		"build:sw:prod": "node node/build-sw.mjs prod",
+		"build": "npm run clean-jsons && npm run gen-all && npm run build:css && npm run build:sw:prod",
 		"preversion": "npm test",
 		"version": "node node/version-bump.js",
 		"serve:dev": "http-server -c-1 --cors --port 5000"
