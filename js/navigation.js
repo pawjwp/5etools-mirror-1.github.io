@@ -165,9 +165,17 @@ class NavBar {
 		this._addElement_button(
 			NavBar._CAT_SETTINGS,
 			{
-				html: "Preload Offline Data",
-				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt),
-				title: "Preload the site data for offline use. Warning: slow. If it appears to freeze, cancel it and try again; progress will be saved.",
+				html: "Preload Adventure Data (24mb+)",
+				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /data\/adventure/),
+				title: "Preload adventure data for offline use.",
+			},
+		);
+		this._addElement_button(
+			NavBar._CAT_SETTINGS,
+			{
+				html: "Preload Adventure Data and Images (2.2gb+)",
+				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /(?:data|img)\/adventure/),
+				title: "Preload adventure data and images for offline use.",
 			},
 		);
 	}
@@ -727,7 +735,7 @@ NavBar.InteractionManager = class {
 		}
 	}
 
-	static async _pOnClick_button_preloadOffline (evt) {
+	static async _pOnClick_button_preloadOffline (evt, route) {
 		evt.preventDefault();
 
 		if (globalThis.swCacheRoutes === undefined) {
@@ -735,7 +743,7 @@ NavBar.InteractionManager = class {
 			return;
 		}
 
-		globalThis.swCacheRoutes(/(?:data|img)\/adventure/);
+		globalThis.swCacheRoutes(route);
 	}
 };
 
