@@ -694,7 +694,7 @@ NavBar._CAT_ADVENTURES = "Adventures";
 NavBar._CAT_REFERENCES = "References";
 NavBar._CAT_UTILITIES = "Utilities";
 NavBar._CAT_SETTINGS = "Settings";
-NavBar._CAT_SETTINGS = "Preload Data";
+NavBar._CAT_CACHE = "Preload Data";
 
 NavBar._navbar = null;
 
