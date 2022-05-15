@@ -162,6 +162,11 @@ class NavBar {
 				title: "Add the site to your home screen. When used in conjunction with the Preload Offline Data option, this can create a functional offline copy of the site.",
 			},
 		);
+		this._addElement_label(NavBar._CAT_SETTINGS,
+			`Sizes displayed are for the individual collection.
+			Data that is already preloaded will not be loaded again.
+			Visiting a page has the same effect as preloading it.`,
+		);
 		this._addElement_button(
 			NavBar._CAT_SETTINGS,
 			{
@@ -176,6 +181,22 @@ class NavBar {
 				html: "Preload Adventure Data and Images (2.2gb+)",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /(?:data|img)\/adventure/),
 				title: "Preload adventure data and images for offline use.",
+			},
+		);
+		this._addElement_button(
+			NavBar._CAT_SETTINGS,
+			{
+				html: "Preload ALL IMAGES (4.3gb+)",
+				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /img/),
+				title: "Preload ALL IMAGES for offline use.",
+			},
+		);
+		this._addElement_button(
+			NavBar._CAT_SETTINGS,
+			{
+				html: "PRELOAD EVERYTHING (???gb)",
+				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /./),
+				title: "Preload EVERYTHING for offline use.",
 			},
 		);
 	}
