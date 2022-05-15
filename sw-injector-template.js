@@ -67,6 +67,15 @@ const swCacheRoutes = (routeRegex) => {
 	JqueryUtil.doToast({content: "warming up!", autoHideTime: 500});
 };
 
+/**
+ * ask the service worker to cancel route caching
+ */
+const swCancelCacheRoutes = () => {
+	wb.messageSW({type: "CANCEL_CACHE_ROUTES"});
+	removeDownloadBar();
+	JqueryUtil.doToast("Preload was canceled. Any data that was preloaded was saved.");
+};
+
 // icky global but no bundler, so no other good choice
 globalThis.swCacheRoutes = swCacheRoutes;
 
@@ -93,7 +102,7 @@ const initDownloadBar = () => {
 	const $btnCancel = $(`<button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>`)
 		.click(() => {
 			removeDownloadBar();
-			// sendMessage({type: "cache-cancel"});
+			swCancelCacheRoutes();
 		});
 
 	const $wrapBar = $$`<div class="page__wrp-download-bar w-100 relative mr-2">${$displayProgress}${$displayPercent}</div>`;

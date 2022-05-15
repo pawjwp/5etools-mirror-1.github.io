@@ -80,6 +80,7 @@ https://stackoverflow.com/questions/52423473/workbox-routing-registerroute-idemp
 precacheAndRoute(self.__WB_PRECACHE_MANIFEST);
 
 class RevisionCacheFirst extends Strategy {
+	cacheRoutesAbortController = null;
 	constructor () {
 		super({ cacheName: "runtime-revision" });
 
@@ -87,7 +88,15 @@ class RevisionCacheFirst extends Strategy {
 		this.activate = this.activate.bind(this);
 		this.cacheRoutes = this.cacheRoutes.bind(this);
 		addEventListener("message", (event) => {
-			if (event.data.type === "CACHE_ROUTES") event.waitUntil(this.cacheRoutes(event.data));
+			if (event.data.type === "CACHE_ROUTES") {
+				this.cacheRoutesAbortController = new AbortController();
+				event.waitUntil(this.cacheRoutes(event.data, this.cacheRoutesAbortController.signal));
+			}
+			if (event.data.type === "CANCEL_CACHE_ROUTES") {
+				console.log("aborting cache!");
+				this.cacheRoutesAbortController?.abort();
+				this.cacheRoutesAbortController = null;
+			}
 		});
 	}
 
@@ -171,8 +180,9 @@ class RevisionCacheFirst extends Strategy {
 	 * When all the original workers have died or finished, any failures will be reported.
 	 *
 	 * @param {{payload: {routeRegex: RegExp}}} data the data sent with the request
+	 * @param {AbortSignal} signal signal to abort the operation
 	 */
-	async cacheRoutes (data) {
+	async cacheRoutes (data, signal) {
 		const cache = await caches.open(this.cacheName);
 
 		const currentCacheKeys = new Set((await cache.keys()).map(request => request.url));
@@ -213,7 +223,7 @@ class RevisionCacheFirst extends Strategy {
 			while (true) {
 				// each instance of this function will keep popping urls off the array until there are none left
 				const url = routesToCache.pop();
-				if (url === undefined) return;
+				if (url === undefined || signal.aborted) return;
 
 				// this regex is a very bad idea, but it trims the cache version off the url
 				const cleanUrl = url.replace(/\?__WB_REVISION__=\w+$/m, "");
