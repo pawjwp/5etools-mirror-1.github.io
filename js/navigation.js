@@ -170,7 +170,7 @@ class NavBar {
 		this._addElement_button(
 			NavBar._CAT_SETTINGS,
 			{
-				html: "Preload Adventure Data (24mb+)",
+				html: "Preload Adventure Data <small>(24mb+)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /data\/adventure/),
 				title: "Preload adventure data for offline use.",
 			},
@@ -178,7 +178,7 @@ class NavBar {
 		this._addElement_button(
 			NavBar._CAT_SETTINGS,
 			{
-				html: "Preload Adventure Data and Images (2.2gb+)",
+				html: "Preload Adventure Data and Images <small>(2.2gb+)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /(?:data|img)\/adventure/),
 				title: "Preload adventure data and images for offline use.",
 			},
@@ -186,7 +186,7 @@ class NavBar {
 		this._addElement_button(
 			NavBar._CAT_SETTINGS,
 			{
-				html: "Preload ALL IMAGES (4.3gb+)",
+				html: "Preload <i><b>ALL IMAGES</b></i> <small>(4.3gb+)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /img/),
 				title: "Preload ALL IMAGES for offline use.",
 			},
@@ -194,7 +194,7 @@ class NavBar {
 		this._addElement_button(
 			NavBar._CAT_SETTINGS,
 			{
-				html: "PRELOAD EVERYTHING (???gb)",
+				html: "<i><b>PRELOAD EVERYTHING</b></i> <small>(???gb)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /./),
 				title: "Preload EVERYTHING for offline use.",
 			},
