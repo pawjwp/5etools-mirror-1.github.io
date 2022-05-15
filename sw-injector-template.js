@@ -72,8 +72,10 @@ const swCacheRoutes = (routeRegex) => {
  */
 const swCancelCacheRoutes = () => {
 	wb.messageSW({type: "CANCEL_CACHE_ROUTES"});
-	removeDownloadBar();
-	JqueryUtil.doToast("Preload was canceled. Any data that was preloaded was saved.");
+	setTimeout(() => {
+		removeDownloadBar();
+		JqueryUtil.doToast("Preload was canceled. Any data that was preloaded was saved.");
+	}, 1000);
 };
 
 // icky global but no bundler, so no other good choice
@@ -85,6 +87,7 @@ let downloadBar = null;
  * Remove the download bar from the dom, and null downloadBar.
  */
 const removeDownloadBar = () => {
+	if (downloadBar === null) return;
 	downloadBar.$wrapOuter.remove();
 	downloadBar = null;
 };
@@ -101,7 +104,6 @@ const initDownloadBar = () => {
 
 	const $btnCancel = $(`<button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>`)
 		.click(() => {
-			removeDownloadBar();
 			swCancelCacheRoutes();
 		});
 
