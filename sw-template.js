@@ -201,6 +201,9 @@ class RevisionCacheFirst extends Strategy {
 		// First call, and awaited, so that pages show a loading bar to indicate fetching has started
 		await postProgress();
 
+		// early escape if there is no work to do.
+		if (fetchTotal === 0) return;
+
 		/**
 		 * The number of fetches to run at the same time
 		 */
