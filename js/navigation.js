@@ -162,13 +162,14 @@ class NavBar {
 				title: "Add the site to your home screen. When used in conjunction with the Preload Offline Data option, this can create a functional offline copy of the site.",
 			},
 		);
-		this._addElement_label(NavBar._CAT_SETTINGS,
+		this._addElement_dropdown(NavBar._CAT_SETTINGS, NavBar._CAT_CACHE, {isSide: true});
+		this._addElement_label(NavBar._CAT_CACHE,
 			`Sizes displayed are for the individual collection.
 			Data that is already preloaded will not be loaded again.
 			Visiting a page has the same effect as preloading it.`,
 		);
 		this._addElement_button(
-			NavBar._CAT_SETTINGS,
+			NavBar._CAT_CACHE,
 			{
 				html: "Preload Adventure Data <small>(24mb+)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /data\/adventure/),
@@ -176,7 +177,7 @@ class NavBar {
 			},
 		);
 		this._addElement_button(
-			NavBar._CAT_SETTINGS,
+			NavBar._CAT_CACHE,
 			{
 				html: "Preload Adventure Data and Images <small>(2.2gb+)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /(?:data|img)\/adventure/),
@@ -184,7 +185,7 @@ class NavBar {
 			},
 		);
 		this._addElement_button(
-			NavBar._CAT_SETTINGS,
+			NavBar._CAT_CACHE,
 			{
 				html: "Preload <i><b>ALL IMAGES</b></i> <small>(4.3gb+)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /img/),
@@ -192,7 +193,7 @@ class NavBar {
 			},
 		);
 		this._addElement_button(
-			NavBar._CAT_SETTINGS,
+			NavBar._CAT_CACHE,
 			{
 				html: "<i><b>PRELOAD EVERYTHING</b></i> <small>(???gb)</small>",
 				click: (evt) => NavBar.InteractionManager._pOnClick_button_preloadOffline(evt, /./),
@@ -693,6 +694,7 @@ NavBar._CAT_ADVENTURES = "Adventures";
 NavBar._CAT_REFERENCES = "References";
 NavBar._CAT_UTILITIES = "Utilities";
 NavBar._CAT_SETTINGS = "Settings";
+NavBar._CAT_CACHE = "Preload Data";
 
 NavBar._navbar = null;
 
