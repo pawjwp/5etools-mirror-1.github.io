@@ -4,7 +4,27 @@ class _ParseStateTextBackground extends BaseParseStateText {
 
 }
 
-class BackgroundParser extends BaseParserFeature {
+class BackgroundParser extends BaseParser {
+	static _doParse_getInitialState (inText, options) {
+		if (!inText || !inText.trim()) {
+			options.cbWarning("No input!");
+			return {};
+		}
+
+		const toConvert = this._getCleanInput(inText, options)
+			.split("\n")
+			.filter(it => it && it.trim());
+
+		const background = {};
+		background.source = options.source;
+		// for the user to fill out
+		background.page = options.page;
+
+		return {toConvert, background};
+	}
+
+	/* -------------------------------------------- */
+
 	/**
 	 * Parses backgrounds from raw text pastes
 	 * @param inText Input text.
@@ -20,7 +40,7 @@ class BackgroundParser extends BaseParserFeature {
 	static doParseText (inText, options) {
 		options = this._getValidOptions(options);
 
-		const {toConvert, entity: background} = this._doParse_getInitialState(inText, options);
+		const {toConvert, background} = this._doParse_getInitialState(inText, options);
 		if (!toConvert) return;
 
 		const state = new _ParseStateTextBackground({toConvert, options, entity: background});
@@ -40,7 +60,7 @@ class BackgroundParser extends BaseParserFeature {
 
 		if (!background.entries?.length) delete background.entries;
 
-		const entityOut = this._getFinalEntity(state, options);
+		const entityOut = this._getFinalEntity(background, options);
 
 		options.cbOutput(entityOut, options.isAppend);
 	}
@@ -60,27 +80,26 @@ class BackgroundParser extends BaseParserFeature {
 	}
 
 	// SHARED UTILITY FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////
-	static _getFinalEntity (state, options) {
-		this._doBackgroundPostProcess(state, options);
-		return PropOrder.getOrdered(state.entity, state.entity.__prop || "background");
+	static _getFinalEntity (entity, options) {
+		this._doBackgroundPostProcess(entity, options);
+		return PropOrder.getOrdered(entity, entity.__prop || "background");
 	}
 
-	static _doBackgroundPostProcess (state, options) {
-		if (!state.entity.entries) return;
+	static _doBackgroundPostProcess (background, options) {
+		if (!background.entries) return;
 
 		// region Tag
-		EntryConvert.tryRun(state.entity, "entries");
-		TagJsons.mutTagObject(state.entity, {keySet: new Set(["entries"]), isOptimistic: false});
+		EntryConvert.tryRun(background, "entries");
+		TagJsons.mutTagObject(background, {keySet: new Set(["entries"]), isOptimistic: false});
 		// endregion
 
 		// region Background-specific cleanup and generation
-		this._doPostProcess_setPrerequisites(state, options);
-		this._doBackgroundPostProcess_feature(state.entity, options);
-		BackgroundSkillTollLanguageEquipmentCoalesce.tryRun(state.entity, {cbWarning: options.cbWarning});
-		BackgroundSkillToolLanguageTag.tryRun(state.entity, {cbWarning: options.cbWarning});
-		this._doBackgroundPostProcess_equipment(state.entity, options);
-		EquipmentBreakdown.tryRun(state.entity, {cbWarning: options.cbWarning});
-		this._doBackgroundPostProcess_tables(state.entity, options);
+		this._doBackgroundPostProcess_feature(background, options);
+		BackgroundSkillTollLanguageEquipmentCoalesce.tryRun(background, {cbWarning: options.cbWarning});
+		BackgroundSkillToolLanguageTag.tryRun(background, {cbWarning: options.cbWarning});
+		this._doBackgroundPostProcess_equipment(background, options);
+		EquipmentBreakdown.tryRun(background, {cbWarning: options.cbWarning});
+		this._doBackgroundPostProcess_tables(background, options);
 		// endregion
 	}
 

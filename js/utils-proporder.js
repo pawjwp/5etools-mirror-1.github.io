@@ -584,7 +584,6 @@ PropOrder._BACKGROUND = [
 	"toolProficiencies",
 	"weaponProficiencies",
 	"armorProficiencies",
-	"skillToolLanguageProficiencies",
 	"expertise",
 
 	"resist",
@@ -1872,37 +1871,6 @@ PropOrder._CARD = [
 	"entries",
 ];
 
-PropOrder._ENCOUNTER = [
-	"name",
-
-	"source",
-	"page",
-
-	new PropOrder._ArrayKey("tables", {
-		order: [
-			"caption",
-			"minlvl",
-			"maxlvl",
-
-			"diceExpression",
-			"rollAttitude",
-			"table",
-
-			"footnotes",
-		],
-		fnSort: SortUtil.ascSortEncounter,
-	}),
-];
-
-PropOrder._CITATION = [
-	"name",
-
-	"source",
-	"page",
-
-	"entries",
-];
-
 PropOrder._PROP_TO_LIST = {
 	"monster": PropOrder._MONSTER,
 	"foundryMonster": PropOrder._FOUNDRY_MONSTER,
@@ -1974,8 +1942,6 @@ PropOrder._PROP_TO_LIST = {
 	"sense": PropOrder._SENSE,
 	"deck": PropOrder._DECK,
 	"card": PropOrder._CARD,
-	"encounter": PropOrder._ENCOUNTER,
-	"citation": PropOrder._CITATION,
 };
 
 globalThis.PropOrder = PropOrder;

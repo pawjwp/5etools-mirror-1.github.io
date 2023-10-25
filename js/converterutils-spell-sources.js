@@ -146,20 +146,10 @@ class _SpellSource {
 }
 
 class _SpellSourceClasses extends _SpellSource {
-	constructor ({spellSourceLookupAdditional = null}) {
-		super();
-		this._spellSourceLookupAdditional = spellSourceLookupAdditional;
-	}
-
 	async pInit () {
-		this._mutAddSpellSourceLookup({spellSourceLookup: await DataUtil.loadJSON(`${Renderer.get().baseUrl}data/spells/sources.json`)});
-		this._mutAddSpellSourceLookup({spellSourceLookup: this._spellSourceLookupAdditional});
-	}
+		const json = await DataUtil.loadJSON(`${Renderer.get().baseUrl}data/spells/sources.json`);
 
-	_mutAddSpellSourceLookup ({spellSourceLookup}) {
-		if (!spellSourceLookup) return;
-
-		Object.entries(spellSourceLookup)
+		Object.entries(json)
 			.forEach(([spellSource, spellNameTo]) => {
 				Object.entries(spellNameTo)
 					.forEach(([spellName, propTo]) => {
@@ -398,7 +388,7 @@ class _AdditionalSpellSourceRewards extends _AdditionalSpellSourceFile {
 }
 
 export class SpellSourceLookupBuilder {
-	static async pGetLookup ({spells, spellSourceLookupAdditional = null}) {
+	static async pGetLookup ({spells}) {
 		const cpySpells = MiscUtil.copyFast(spells);
 
 		const lookup = {};
@@ -419,7 +409,7 @@ export class SpellSourceLookupBuilder {
 			const modalFilterSpells = new ModalFilterSpells({allData: cpySpells});
 			await modalFilterSpells.pPopulateHiddenWrapper();
 
-			const adder = new Clazz({modalFilterSpells, spellSourceLookupAdditional});
+			const adder = new Clazz({modalFilterSpells});
 			await adder.pInit();
 			adder.mutLookup(lookup);
 

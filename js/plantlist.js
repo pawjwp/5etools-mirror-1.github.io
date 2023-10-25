@@ -1,6 +1,12 @@
 "use strict";
 
 class ConditionsDiseasesSublistManager extends SublistManager {
+	constructor () {
+		super({
+			sublistClass: "subconditions",
+		});
+	}
+
 	static get _ROW_TEMPLATE () {
 		return [
 			new SublistCellTemplate({
@@ -54,6 +60,8 @@ class ConditionsDiseasesPage extends ListPage {
 			pFnGetFluff: Renderer.condition.pGetFluff.bind(Renderer.condition),
 
 			pageFilter,
+
+			listClass: "conditions",
 
 			dataProps: ["condition", "disease", "status"],
 

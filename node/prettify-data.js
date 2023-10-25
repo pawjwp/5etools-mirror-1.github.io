@@ -19,6 +19,8 @@ const FILE_BLOCKLIST = new Set([
 	"msbcr.json",
 	"monsterfeatures.json",
 	"index.json",
+	"encounters.json",
+	"names.json",
 	"life.json",
 	"makecards.json",
 	"renderdemo.json",
@@ -234,7 +236,6 @@ function getFnListSort (prop) {
 		case "sense":
 		case "skill":
 		case "deck":
-		case "citation":
 			return SortUtil.ascSortGenericEntity.bind(SortUtil);
 		case "deity":
 			return SortUtil.ascSortDeity.bind(SortUtil);
@@ -266,8 +267,6 @@ function getFnListSort (prop) {
 			|| SortUtil.ascSortLower(a.raceSource, b.raceSource)
 			|| SortUtil.ascSortLower(a.name || "", b.name || "")
 			|| SortUtil.ascSortLower(a.source, b.source);
-		case "encounter":
-			return SortUtil.ascSortEncounter.bind(SortUtil);
 		case "adventure": return SortUtil.ascSortAdventure.bind(SortUtil);
 		case "book": return SortUtil.ascSortBook.bind(SortUtil);
 		case "adventureData":

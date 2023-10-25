@@ -502,8 +502,7 @@
 													"height": 2160,
 													"mapParent": {
 														"id": "032"
-													},
-													"credit": "Marco Bernardini"
+													}
 												}
 											]
 										},
@@ -607,8 +606,7 @@
 													"height": 4400,
 													"mapParent": {
 														"id": "033"
-													},
-													"credit": "Jared Blando"
+													}
 												}
 											]
 										},
@@ -687,8 +685,7 @@
 													"height": 2160,
 													"mapParent": {
 														"id": "034"
-													},
-													"credit": "Marco Bernardini"
+													}
 												}
 											]
 										},
@@ -866,8 +863,7 @@
 													"height": 4400,
 													"mapParent": {
 														"id": "035"
-													},
-													"credit": "Jared Blando"
+													}
 												}
 											]
 										}
