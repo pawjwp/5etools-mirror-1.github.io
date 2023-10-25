@@ -547,9 +547,9 @@ class IndexableFileConditions extends IndexableFile {
 	constructor () {
 		super({
 			category: Parser.CAT_ID_CONDITION,
-			file: "conditionsdiseases.json",
+			file: "plantlist.json",
 			listProp: "condition",
-			baseUrl: "conditionsdiseases.html",
+			baseUrl: "plantlist.html",
 			isHover: true,
 		});
 	}
@@ -559,9 +559,9 @@ class IndexableFileDiseases extends IndexableFile {
 	constructor () {
 		super({
 			category: Parser.CAT_ID_DISEASE,
-			file: "conditionsdiseases.json",
+			file: "plantlist.json",
 			listProp: "disease",
-			baseUrl: "conditionsdiseases.html",
+			baseUrl: "plantlist.html",
 			isHover: true,
 		});
 	}
@@ -571,9 +571,9 @@ class IndexableFileStatuses extends IndexableFile {
 	constructor () {
 		super({
 			category: Parser.CAT_ID_STATUS,
-			file: "conditionsdiseases.json",
+			file: "plantlist.json",
 			listProp: "status",
-			baseUrl: "conditionsdiseases.html",
+			baseUrl: "plantlist.html",
 			isHover: true,
 		});
 	}

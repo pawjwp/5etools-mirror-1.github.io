@@ -2745,7 +2745,7 @@ UrlUtil.PG_SPELLS = "spells.html";
 UrlUtil.PG_BACKGROUNDS = "backgrounds.html";
 UrlUtil.PG_ITEMS = "items.html";
 UrlUtil.PG_CLASSES = "classes.html";
-UrlUtil.PG_CONDITIONS_DISEASES = "conditionsdiseases.html";
+UrlUtil.PG_CONDITIONS_DISEASES = "plantlist.html";
 UrlUtil.PG_FEATS = "feats.html";
 UrlUtil.PG_OPT_FEATURES = "optionalfeatures.html";
 UrlUtil.PG_PSIONICS = "psionics.html";
@@ -5077,17 +5077,17 @@ globalThis.DataUtil = {
 
 	condition: class extends _DataUtilPropConfigSingleSource {
 		static _PAGE = UrlUtil.PG_CONDITIONS_DISEASES;
-		static _FILENAME = "conditionsdiseases.json";
+		static _FILENAME = "plantlist.json";
 	},
 
 	conditionFluff: class extends _DataUtilPropConfigSingleSource {
 		static _PAGE = UrlUtil.PG_CONDITIONS_DISEASES;
-		static _FILENAME = "fluff-conditionsdiseases.json";
+		static _FILENAME = "fluff-plantlist.json";
 	},
 
 	disease: class extends _DataUtilPropConfigSingleSource {
 		static _PAGE = UrlUtil.PG_CONDITIONS_DISEASES;
-		static _FILENAME = "conditionsdiseases.json";
+		static _FILENAME = "plantlist.json";
 	},
 
 	feat: class extends _DataUtilPropConfigSingleSource {

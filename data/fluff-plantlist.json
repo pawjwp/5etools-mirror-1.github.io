@@ -8,7 +8,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/blinded.webp"
+						"path": "plantlist/PHB/blinded.webp"
 					}
 				}
 			]
@@ -21,7 +21,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/charmed.webp"
+						"path": "plantlist/PHB/charmed.webp"
 					}
 				}
 			]
@@ -34,7 +34,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/deafened.webp"
+						"path": "plantlist/PHB/deafened.webp"
 					}
 				}
 			]
@@ -47,7 +47,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/frightened.webp"
+						"path": "plantlist/PHB/frightened.webp"
 					}
 				}
 			]
@@ -60,7 +60,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/grappled.webp"
+						"path": "plantlist/PHB/grappled.webp"
 					}
 				}
 			]
@@ -73,7 +73,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/invisible.webp"
+						"path": "plantlist/PHB/invisible.webp"
 					}
 				}
 			]
@@ -86,7 +86,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/paralyzed.webp"
+						"path": "plantlist/PHB/paralyzed.webp"
 					}
 				}
 			]
@@ -99,7 +99,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/petrified.webp"
+						"path": "plantlist/PHB/petrified.webp"
 					}
 				}
 			]
@@ -112,7 +112,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/poisoned.webp"
+						"path": "plantlist/PHB/poisoned.webp"
 					}
 				}
 			]
@@ -125,7 +125,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/prone.webp"
+						"path": "plantlist/PHB/prone.webp"
 					}
 				}
 			]
@@ -138,7 +138,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/restrained.webp"
+						"path": "plantlist/PHB/restrained.webp"
 					}
 				}
 			]
@@ -151,7 +151,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/stunned.webp"
+						"path": "plantlist/PHB/stunned.webp"
 					}
 				}
 			]
@@ -164,7 +164,7 @@
 					"type": "image",
 					"href": {
 						"type": "internal",
-						"path": "conditionsdiseases/PHB/unconscious.webp"
+						"path": "plantlist/PHB/unconscious.webp"
 					}
 				}
 			]

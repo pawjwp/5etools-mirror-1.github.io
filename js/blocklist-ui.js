@@ -19,7 +19,7 @@ class BlocklistUtil {
 		"books.json",
 		"cultsboons.json",
 		"charcreationoptions.json",
-		"conditionsdiseases.json",
+		"plantlist.json",
 		"deities.json",
 		"feats.json",
 		"items-base.json",

@@ -742,7 +742,7 @@ class _DataTypeLoaderConditionDisease extends _DataTypeLoaderSingleSource {
 	static PROPS = ["condition", "disease", "status"];
 	static PAGE = UrlUtil.PG_CONDITIONS_DISEASES;
 
-	_filename = "conditionsdiseases.json";
+	_filename = "plantlist.json";
 }
 
 class _DataTypeLoaderSkill extends _DataTypeLoaderSingleSource {
@@ -858,7 +858,7 @@ class _DataTypeLoaderConditionDiseaseFluff extends _DataTypeLoaderSingleSource {
 	static PAGE = UrlUtil.PG_CONDITIONS_DISEASES;
 	static IS_FLUFF = true;
 
-	_filename = "fluff-conditionsdiseases.json";
+	_filename = "fluff-plantlist.json";
 }
 
 class _DataTypeLoaderPredefined extends _DataTypeLoader {

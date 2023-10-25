@@ -76,7 +76,7 @@ class _TestTokenImages {
 			"races",
 			"vehicles",
 			"characters",
-			"conditionsdiseases",
+			"plantlist",
 			"languages",
 			"plutonium",
 			"covers",
